@@ -8,6 +8,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { MainComponent } from './components/main/main.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { NetworkComponent } from './components/network/network.component';
+import { RelationshipComponent } from './components/relationship/relationship.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { NetworkComponent } from './components/network/network.component';
     HeaderComponent,
     MainComponent,
     SidebarComponent,
-    NetworkComponent
+    NetworkComponent,
+    RelationshipComponent
   ],
   imports: [
     BrowserModule,
