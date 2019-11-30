@@ -1,3 +1,21 @@
+
 <div>
-  This is where the main node-link network graph will be.
+<h2>Character View</h2>
+<form action="/action_page.php">
+  <input type="checkbox" id="overview" (change) = "handleScnSelection($event, id)" > Overview<br>
+  <input type="checkbox" id="a1s1" (change) = "handleScnSelection($event, id)" > Act 1, Scene 1<br>
+  <input type="checkbox" id="a1s2" (change) = "handleScnSelection($event, id)" > Act 1, Scene 2<br>
+  <input type="checkbox" id="a2s1" (change) = "handleScnSelection($event, id)" > Act 2, Scene 1<br>
+  <input type="checkbox" id="a2s2" (change) = "handleScnSelection($event, id)" > Act 2, Scene 2<br>
+  </form>
+
+<svg  id="graphContainer"
+      width="100%"
+      height="100%"
+      class="associations"
+      #graphContainer>
+</svg>
 </div>
+
+
+
