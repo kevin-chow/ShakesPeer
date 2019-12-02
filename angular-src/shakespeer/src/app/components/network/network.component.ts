@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, ElementRef } from '@angular/core';
 import * as d3 from 'd3';
-import { nodes, links } from './speech_data';
+import { nodes, links, type } from './speech_data';
 
 
 @Component({
@@ -12,7 +12,7 @@ export class NetworkComponent implements OnInit {
   ngOnInit(): void { }
 
   maxWords = 2035;
-  maxRadius = 80;
+  maxRadius = 50;
   minRadius = 15;
 
   title = 'ng-d3-graph-editor';
@@ -31,8 +31,13 @@ export class NetworkComponent implements OnInit {
 
   selectedScn = 'overview';
 
-  posColor = d3.color('black');
-  negColor = d3.color('black');
+  posColor = d3.color('#80b1d3');
+  negColor = d3.color('#fb8072');
+  neutralColor = d3.color('#d9d9d9');
+
+  fairyColor = d3.color('#b3de69');
+  loverColor = d3.color('#bc80bd');
+  actorColor = d3.color('#fdb462');
 
 
   // Mouse event variables
@@ -118,13 +123,17 @@ export class NetworkComponent implements OnInit {
       .force("link", d3.forceLink()
         .id(function(d) { return d.id; })
         .distance(function(d) {
-          return d.source.radius + 55 + d.target.radius;
+          return d.source.radius + 60 + d.target.radius;
         }))
-      .force('charge', d3.forceManyBody().strength(function(d) {
-        return -85 * d.radius;
+      .force('charge', d3.forceManyBody().strength(function(d, i) {
+        if (i == 0) {
+          // return -10000;
+        } else {
+          return -105 * d.radius;
+        }
       }))
-      .force('x', d3.forceX(this.width / 2).strength(0.35))
-      .force('y', d3.forceY(this.height / 2).strength(0.35))
+      .force('x', d3.forceX(this.width / 2).strength(0.25))
+      .force('y', d3.forceY(this.height / 2).strength(0.25))
       .on('tick', () => this.tick());
   }
 
@@ -139,13 +148,14 @@ export class NetworkComponent implements OnInit {
       .attr("viewBox", "0 -5 10 10")
       .attr("refX", 9)
       .attr("refY", 0)
-      .attr("markerWidth", 4)
-      .attr("markerHeight", 4)
+      .attr("markerWidth", 3)
+      .attr("markerHeight", 3)
       .attr("orient", "auto")
       .append('svg:path') 
       .attr("d", "M 0, -5 L 10, 0 L 0, 5")
-      .attr('fill', d3.rgb("#bbb"));
-  
+      //.attr('fill', d3.rgb("#bbb"));
+      .attr('fill', this.neutralColor);
+      
   // Handles to link and node element groups
   this.path = this.svg.append('svg:g').selectAll('path');
   this.circle = this.svg.append('svg:g').selectAll('g');
@@ -229,11 +239,12 @@ export class NetworkComponent implements OnInit {
     // Add new links
     this.path = this.path.enter().append('svg:path')
       .attr('class', 'link')
-      .style('stroke', d3.rgb("#bbb"))
+      // .style('stroke', d3.rgb("#bbb"))
+      .style('stroke', this.neutralColor)
       .style('stroke-width', '2px')
       .style('fill', 'none')
       .attr('marker-end','url(#arrow)')
-      // .style('opacity', 0.5)
+      .style('opacity', 0.75)
       .style('display', function(d) {
         if (d.source.visible) {
           if (d.target.visible) {
@@ -254,9 +265,22 @@ export class NetworkComponent implements OnInit {
     g.append('svg:circle')
       .attr('class', 'node')
       .attr('r', function(d) { return d.radius })
-      .style('fill', (d) => this.colors(d.id))
+      //.style('fill', (d) => this.colors(d.id))
+      //.style('fill', d3.rgb('#8dd3c7'))
+      // .style('fill', this.neutralColor)
+      .style('fill', (d) => 
+        (d.type == type.LOVER) ? this.loverColor : 
+        (d.type == type.FAIRY) ? this.fairyColor : 
+        (d.type == type.ACTOR) ? this.actorColor : this.neutralColor)
+      
       .style('stroke', () => d3.rgb("white"))
-      .style('stroke-width', '2px');
+      .style('stroke-width', '2px')
+      .on('mouseover', function() {
+        d3.select(this).style('transform', 'scale(1.2)');
+      })
+      .on('mouseout', function() {
+        d3.select(this).style('transform', 'scale(1)');
+      });
       
 
     g.append('svg:text')
@@ -269,18 +293,14 @@ export class NetworkComponent implements OnInit {
       .style('display', (d) => (d.visible) ? 'flex' : 'none');
 
     this.circle = g.merge(this.circle)
-      .call(this.drag)
-      // .on('mouseover', function(d) {
-      //   d3.select(this).style('fill', d3.rgb(this.colors(d.id)).brighter())
-      // })
+      .call(this.drag);
+      
      
       // .on('mouseout', function(d) {
       //   d3.select(this)
       //   .style('opacity', 1.0);
       // })
-      .on('click', function(d) {
-        this.selectedNode = d;
-      });
+      ;
 
   
 
