@@ -11,15 +11,15 @@ import { nodes, links } from './speech_data';
 export class NetworkComponent implements OnInit {
   ngOnInit(): void { }
 
-  maxWords = 2035;
-
-  viewState = "overview";
+  maxWords = 467;
+  maxRadius = 80;
+  minRadius = 10;
 
   title = 'ng-d3-graph-editor';
   @ViewChild('graphContainer') graphContainer: ElementRef;
 
-  width = 2000;
-  height = 800;
+  width = 4000;
+  height = 700;
   colors = d3.scaleOrdinal(d3.schemeSet3);
 
   svg: any;
@@ -29,6 +29,12 @@ export class NetworkComponent implements OnInit {
   drag: any;
   dragLine: any;
 
+  selectedScn = 'a1s1';
+
+  posColor = d3.color('black');
+  negColor = d3.color('black');
+
+
   // Mouse event variables
   selectedNode = null;
   selectedLink = null;
@@ -37,86 +43,153 @@ export class NetworkComponent implements OnInit {
   mouseupNode = null;
 
   handleScnSelection(e) {
-    console.log(e.target.id);
     if (e.target.checked) {
-      if (e.target.id == "overview") {
-        d3.selectAll('svg').selectAll('circle')
-        .attr('r', (d) => (d.total / this.maxWords) * 110);
-
-        d3.selectAll('svg').selectAll('text')
-        .style('opacity', 1.0);
-      } else if (e.target.id == "a1s1") {
-        d3.selectAll('svg').selectAll('circle')
-        .attr('r', (d) => (d.a1s1 / this.maxWords) * 400);
-
-        d3.selectAll('svg').selectAll('text')
-        .style('opacity', (d) => (d.a1s1 == 0) ? 0.0 : 1.0);
-
-
-
-      } else if (e.target.id == "a1s2") {
-        d3.selectAll('svg').selectAll('circle')
-        .attr('r', (d) => (d.a1s2 / this.maxWords) * 400);
-
-        d3.selectAll('svg').selectAll('text')
-        .style('opacity', (d) => (d.a1s2 == 0) ? 0.0 : 1.0);
-
-      } else if (e.target.id == "a2s1") {
-        d3.selectAll('svg').selectAll('circle')
-        .attr('r', (d) => (d.a2s1 / this.maxWords) * 400);
-
-        d3.selectAll('svg').selectAll('text')
-        .style('opacity', (d) => (d.a2s1 == 0) ? 0.0 : 1.0);
-      } else if (e.target.id == "a2s2") {
-        d3.selectAll('svg').selectAll('circle')
-        .attr('r', (d) => (d.a2s2 / this.maxWords) * 400);
-
-        d3.selectAll('svg').selectAll('text')
-        .style('opacity', (d) => (d.a2s2 == 0) ? 0.0 : 1.0);
+      this.selectedScn = e.target.id;
+      console.log(this.selectedScn);
+      this.reset();
+      this.setRadius();
+      this.setForces();
+      this.setSvg();
+      this.restart();
       }
-    }
   }
 
-  ngAfterContentInit() {
-    const rect = this.graphContainer.nativeElement.getBoundingClientRect();
-    this.width = rect.width;
+  reset() {
+    this.svg.selectAll("*").remove();
+  }
 
+
+  setRadius() {
+    let max = -1;
+    for (let n of nodes) {
+      let numWords = 0;
+      switch (this.selectedScn) {
+        case "overview": {
+          numWords = n.total;
+          break;
+        }
+        case "a1s1": {
+          numWords = n.a1s1;
+          break;
+        } 
+        case "a1s2": {
+          numWords = n.a1s2;
+          break;
+        }
+        case "a2s1": {
+          numWords = n.a2s1;
+          break;
+        }
+        case "a2s2": {
+          numWords = n.a2s2;
+          break;
+        }
+        default: {
+          numWords = n.total;
+          break;
+        }
+      }
+      
+      if (max < numWords) {
+        max = numWords;
+      }
+
+      n.radius = (numWords / this.maxWords) * this.maxRadius;
+      if (n.radius <= 0) {
+        n.visible = false;
+      } else {
+        n.visible = true;
+      }
+      if (n.radius < this.minRadius && n.radius !== 0) {
+        n.radius = this.minRadius;
+      }
+    }
+    this.maxWords = max;
+  }
+
+  setForces() {
+    this.force = d3.forceSimulation()
+      .force("link", d3.forceLink()
+        .id(function(d) { return d.id; })
+        .distance(function(d) {
+          return d.source.radius + 60 + d.target.radius;
+        }))
+      .force('charge', d3.forceManyBody().strength(function(d) {
+        return -70 * d.radius;
+      }))
+      .force('x', d3.forceX(this.width / 2).strength(0.3))
+      .force('y', d3.forceY(this.height / 2).strength(0.3))
+      .on('tick', () => this.tick());
+  }
+
+  setSvg() {
     this.svg = d3.select('#graphContainer')
       .attr('oncontextmenu', 'return false;')
       .attr('width', this.width)
       .attr('height', this.height);
 
-    this.force = d3.forceSimulation()
-      .force('link', d3.forceLink().id((d: any) => d.id).distance(150))
-      .force('charge', d3.forceManyBody().strength(-500))
-      .force('x', d3.forceX(this.width / 2))
-      .force('y', d3.forceY(this.height / 2))
-      .on('tick', () => this.tick());
+    this.svg.append("defs").append("marker")
+      .attr("id", "arrow")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 9)
+      .attr("refY", 0)
+      .attr("markerWidth", 4)
+      .attr("markerHeight", 4)
+      .attr("orient", "auto")
+      .append('svg:path') 
+      .attr("d", "M 0, -5 L 10, 0 L 0, 5")
+      .attr('fill', d3.rgb("gray"));
+  
+  // Handles to link and node element groups
+  this.path = this.svg.append('svg:g').selectAll('path');
+  this.circle = this.svg.append('svg:g').selectAll('g');
+}
+  
 
-    // Handles to link and node element groups
-    this.path = this.svg.append('svg:g').selectAll('path');
-    this.circle = this.svg.append('svg:g').selectAll('g');
+  ngAfterContentInit() {
+    const rect = this.graphContainer.nativeElement.getBoundingClientRect();
+    this.width = rect.width;
 
-    // d3.select("#overview").on("change",function() {
-    //   if (d3.select("#overview").property("checked")) {
-    //     console.log("overview selected");
-    //     this.viewState = "overview";
-    //   }});
+    
+
+  
+      this.drag = d3.drag()
+      .on('start', (d: any) => {
+        if (!d3.event.active) this.force.alphaTarget(0.2).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      })
+      .on('drag', (d: any) => {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+      })
+      .on('end', (d: any) => {
+        if (!d3.event.active) this.force.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      });
+
       
+
+    
+    
     // App starts here
+    this.setSvg();
+    this.setRadius();
+    this.setForces();
     this.restart();
   }
 
   // Update force layout (called automatically each iteration)
   tick() {
-    this.path.attr('d', (d: any) => {
+    this.path.attr('d', (d) => {
       const deltaX = d.target.x - d.source.x;
       const deltaY = d.target.y - d.source.y;
       const dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       const normX = deltaX / dist;
       const normY = deltaY / dist;
-      const sourcePadding = d.left ? 17 : 12;
-      const targetPadding = d.right ? 17 : 12;
+      const sourcePadding = d.source.radius;
+      const targetPadding = d.target.radius;
       const sourceX = d.source.x + (sourcePadding * normX);
       const sourceY = d.source.y + (sourcePadding * normY);
       const targetX = d.target.x - (targetPadding * normX);
@@ -126,33 +199,30 @@ export class NetworkComponent implements OnInit {
     this.circle.attr('transform', (d) => `translate(${d.x},${d.y})`);
   }
 
-  resetMouseVars() {
-    this.mousedownNode = null;
-    this.mouseupNode = null;
-    this.mousedownLink = null;
-  }
-
-  // update graph (called when needed)
+  // Update graph 
   restart() {
-    
     this.path = this.path.data(links);
-
-
     // Remove old links
     this.path.exit().remove();
 
     // Add new links
     this.path = this.path.enter().append('svg:path')
-      // .attr('class', 'link')
-      .style('stroke', 'black');
+      .attr('class', 'link')
+      .style('stroke', d3.rgb("gray"))
+      .style('stroke-width', '2px')
+      .attr('marker-end','url(#arrow)')
+      .style('display', function(d) {
+        if (d.source.visible) {
+          if (d.target.visible) {
+            return 'flex';
+          } 
+        }
+        return 'none';
+      });
 
     this.circle = this.circle.data(nodes, (d) => d.id);
-
-    // this.circle.selectAll('circle')
-    //   .style('fill', (d) => (d === this.selectedNode) ? d3.rgb(this.colors(d.id)).brighter().toString() : this.colors(d.id));
-
     
-    // Remove old Nods
+    // Remove old Nodes
     this.circle.exit().remove();
 
     // Add new nodes
@@ -160,71 +230,54 @@ export class NetworkComponent implements OnInit {
 
     g.append('svg:circle')
       .attr('class', 'node')
-      .attr('r', (d) => (d.total / this.maxWords) * 110)
+      .attr('r', function(d) { return d.radius })
       .style('fill', (d) => (d === this.selectedNode) ? d3.rgb(this.colors(d.id)).brighter().toString() : this.colors(d.id))
-      .style('stroke', () => d3.rgb("black"))
-      .on('mousedown', (d) => {
-        this.mousedownNode = d;
-        this.selectedNode = (this.mousedownNode === this.selectedNode) ? null : this.mousedownNode;
-        this.restart();
-      })
-      //   d3.select(this)
-      //     .style('fill', d3.rgb(this.colors(d.id)).brighter().toString());
-      // })
-      ;
-   
+      .style('stroke', () => d3.rgb("white"))
+      .style('stroke-width', '2px');
+      
+
     g.append('svg:text')
       .attr('x', 0)
       .attr('y', 4)
       .attr('class', 'id')
       .attr("text-anchor", "middle")
-      .text((d) => d.id);
+      .text((d) => d.id)
+      .style('font-size', 'smaller')
+      .style('display', (d) => (d.visible) ? 'flex' : 'none');
 
-    this.circle = g.merge(this.circle);
+    this.circle = g.merge(this.circle)
+      .call(this.drag)
+      // .on('mouseover', function(d) {
+      //   d3.select(this).style('fill', d3.rgb(this.colors(d.id)).brighter())
+      // })
+     
+      // .on('mouseout', function(d) {
+      //   d3.select(this)
+      //   .style('opacity', 1.0);
+      // })
+      .on('click', function(d) {
+        this.selectedNode = d;
+      });
 
-    
+  
 
-
-
-
+  
     // set the graph in motion
     this.force
       .nodes(nodes)
       .force('link').links(links);
+    
+    this.force.alpha(1).restart();
+    
+    
 
-    this.force.alphaTarget(0.3).restart();
+ // }
+
   }
-
-  mousedown(dataItem: any, value: any, source: any) {
-    // because :active only works in WebKit?
-    // this.svg.classed('active', true);
+//}
 
 
-    // this.restart();
-  }
 
-  mousemove(source: any) {
-    if (!this.mousedownNode) return;
 
-    // update drag line
-    this.dragLine.attr('d', `M${this.mousedownNode.x},${this.mousedownNode.y}L${d3.mouse(d3.event.currentTarget)[0]},${d3.mouse(d3.event.currentTarget)[1]}`);
-
-    this.restart();
-  }
-
-  mouseup(source: any) {
-    if (this.mousedownNode) {
-      // hide drag line
-      // this.dragLine
-      //   .classed('hidden', true)
-      //   .style('marker-end', '');
-    }
-
-    // because :active only works in WebKit?
-    this.svg.classed('active', false);
-
-    // clear mouse event vars
-    this.resetMouseVars();
-  }
 
 }
