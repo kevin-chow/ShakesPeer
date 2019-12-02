@@ -11,9 +11,9 @@ import { nodes, links } from './speech_data';
 export class NetworkComponent implements OnInit {
   ngOnInit(): void { }
 
-  maxWords = 467;
+  maxWords = 2035;
   maxRadius = 80;
-  minRadius = 10;
+  minRadius = 15;
 
   title = 'ng-d3-graph-editor';
   @ViewChild('graphContainer') graphContainer: ElementRef;
@@ -29,7 +29,7 @@ export class NetworkComponent implements OnInit {
   drag: any;
   dragLine: any;
 
-  selectedScn = 'a1s1';
+  selectedScn = 'overview';
 
   posColor = d3.color('black');
   negColor = d3.color('black');
@@ -37,10 +37,7 @@ export class NetworkComponent implements OnInit {
 
   // Mouse event variables
   selectedNode = null;
-  selectedLink = null;
-  mousedownLink = null;
-  mousedownNode = null;
-  mouseupNode = null;
+ 
 
   handleScnSelection(e) {
     if (e.target.checked) {
@@ -56,44 +53,54 @@ export class NetworkComponent implements OnInit {
 
   reset() {
     this.svg.selectAll("*").remove();
+    if(this.selectedScn == 'overview') {
+      this.maxWords = 2035;
+    } else if (this.selectedScn == 'a1s1') {
+      this.maxWords = 432;
+    } else if (this.selectedScn == 'a1s2') {
+      this.maxWords = 365;
+    } else if (this.selectedScn == 'a2s1') {
+      this.maxWords = 605;
+    } else if (this.selectedScn == 'a2s2') {
+      this.maxWords = 359;
+    } else if (this.selectedScn == 'a3s1') {
+      this.maxWords = 707;
+    } else if (this.selectedScn == 'a3s2') {
+      this.maxWords = 899;
+    } else if (this.selectedScn == 'a4s1') {
+      this.maxWords = 395;
+    } else if (this.selectedScn == 'a4s2') {
+      this.maxWords = 157;
+    } else if (this.selectedScn == 'a5s1') {
+      this.maxWords = 949;
+    }
   }
 
 
   setRadius() {
-    let max = -1;
     for (let n of nodes) {
       let numWords = 0;
-      switch (this.selectedScn) {
-        case "overview": {
-          numWords = n.total;
-          break;
-        }
-        case "a1s1": {
-          numWords = n.a1s1;
-          break;
-        } 
-        case "a1s2": {
-          numWords = n.a1s2;
-          break;
-        }
-        case "a2s1": {
-          numWords = n.a2s1;
-          break;
-        }
-        case "a2s2": {
-          numWords = n.a2s2;
-          break;
-        }
-        default: {
-          numWords = n.total;
-          break;
-        }
+      if(this.selectedScn == 'overview') {
+        numWords = n.total;
+      } else if (this.selectedScn == 'a1s1') {
+        numWords = n.a1s1;
+      } else if (this.selectedScn == 'a1s2') {
+        numWords = n.a1s2;
+      } else if (this.selectedScn == 'a2s1') {
+        numWords = n.a2s1;
+      } else if (this.selectedScn == 'a2s2') {
+        numWords = n.a2s2;
+      } else if (this.selectedScn == 'a3s1') {
+        numWords = n.a3s1;
+      } else if (this.selectedScn == 'a3s2') {
+        numWords = n.a3s2;
+      } else if (this.selectedScn == 'a4s1') {
+        numWords = n.a4s1;
+      } else if (this.selectedScn == 'a4s2') {
+        numWords = n.a4s2;
+      } else if (this.selectedScn == 'a5s1') {
+        numWords = n.a5s1;
       }
-      
-      if (max < numWords) {
-        max = numWords;
-      }
-
       n.radius = (numWords / this.maxWords) * this.maxRadius;
       if (n.radius <= 0) {
         n.visible = false;
@@ -104,7 +111,6 @@ export class NetworkComponent implements OnInit {
         n.radius = this.minRadius;
       }
     }
-    this.maxWords = max;
   }
 
   setForces() {
@@ -112,13 +118,13 @@ export class NetworkComponent implements OnInit {
       .force("link", d3.forceLink()
         .id(function(d) { return d.id; })
         .distance(function(d) {
-          return d.source.radius + 60 + d.target.radius;
+          return d.source.radius + 55 + d.target.radius;
         }))
       .force('charge', d3.forceManyBody().strength(function(d) {
-        return -70 * d.radius;
+        return -85 * d.radius;
       }))
-      .force('x', d3.forceX(this.width / 2).strength(0.3))
-      .force('y', d3.forceY(this.height / 2).strength(0.3))
+      .force('x', d3.forceX(this.width / 2).strength(0.35))
+      .force('y', d3.forceY(this.height / 2).strength(0.35))
       .on('tick', () => this.tick());
   }
 
@@ -138,7 +144,7 @@ export class NetworkComponent implements OnInit {
       .attr("orient", "auto")
       .append('svg:path') 
       .attr("d", "M 0, -5 L 10, 0 L 0, 5")
-      .attr('fill', d3.rgb("gray"));
+      .attr('fill', d3.rgb("#bbb"));
   
   // Handles to link and node element groups
   this.path = this.svg.append('svg:g').selectAll('path');
@@ -182,6 +188,20 @@ export class NetworkComponent implements OnInit {
 
   // Update force layout (called automatically each iteration)
   tick() {
+
+    // this.path.attr("d", function (d) {
+    //   var dx = d.target.x - d.source.x,
+    //       dy = d.target.y - d.source.y,
+    //       dr = Math.sqrt(dx * dx + dy * dy);
+      
+    //     var sourceX = d.source.x + (d.source.radius * (dx / dr)),
+    //       sourceY = d.source.y + (d.source.radius * (dy / dr)),
+    //       targetX = d.target.x - (d.target.radius * (dx / dr)),
+    //       targetY = d.target.y - (d.target.radius * (dy / dr));
+
+    //   return "M" + sourceX + "," + sourceY + "A" + dr + "," + dr + " 0 0,1 " + targetX + "," + targetY;
+    // });
+   
     this.path.attr('d', (d) => {
       const deltaX = d.target.x - d.source.x;
       const deltaY = d.target.y - d.source.y;
@@ -199,6 +219,7 @@ export class NetworkComponent implements OnInit {
     this.circle.attr('transform', (d) => `translate(${d.x},${d.y})`);
   }
 
+
   // Update graph 
   restart() {
     this.path = this.path.data(links);
@@ -208,9 +229,11 @@ export class NetworkComponent implements OnInit {
     // Add new links
     this.path = this.path.enter().append('svg:path')
       .attr('class', 'link')
-      .style('stroke', d3.rgb("gray"))
+      .style('stroke', d3.rgb("#bbb"))
       .style('stroke-width', '2px')
+      .style('fill', 'none')
       .attr('marker-end','url(#arrow)')
+      // .style('opacity', 0.5)
       .style('display', function(d) {
         if (d.source.visible) {
           if (d.target.visible) {
@@ -231,7 +254,7 @@ export class NetworkComponent implements OnInit {
     g.append('svg:circle')
       .attr('class', 'node')
       .attr('r', function(d) { return d.radius })
-      .style('fill', (d) => (d === this.selectedNode) ? d3.rgb(this.colors(d.id)).brighter().toString() : this.colors(d.id))
+      .style('fill', (d) => this.colors(d.id))
       .style('stroke', () => d3.rgb("white"))
       .style('stroke-width', '2px');
       
