@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, ElementRef } from '@angular/core';
 import * as d3 from 'd3';
-import {sentimentAB, sentimentBA, characterPairs} from './relationship_data';
+import {sentiment_AFINN, sentiment_BL} from './relationship_data';
 
 @Component({
   selector: 'app-relationship',
@@ -10,12 +10,11 @@ import {sentimentAB, sentimentBA, characterPairs} from './relationship_data';
 export class RelationshipComponent implements OnInit {
     title = 'Line Chart';
 
-    private margin = {top: 10, right: 20, bottom: 50, left: 50};
+    private margin = {top: 20, right: 20, bottom: 50, left: 20};
     private width: number;
     private height: number;
     private x: any;
     private y: any;
-    private r: any;
     private svg: any;
     private line: d3.line<[number, number]>; // this is line definition
 
@@ -25,39 +24,60 @@ export class RelationshipComponent implements OnInit {
   constructor() { 
       // configure margins and width/height of the graph
 
-   this.width = 400 - this.margin.left - this.margin.right;
+   this.width = 350 - this.margin.left - this.margin.right;
    this.height = 200 - this.margin.top - this.margin.bottom;}
 
   ngOnInit() {
-        this.readData("THESEUS", "HIPPOLYTA");
-        this.buildSvg();
-        this.addXandYAxis();
-        this.drawLineAndPath(this.sentimentAB, 'blue', 'circle');
-        this.drawLineAndPath(this.sentimentBA, 'red', 'rect');
-        this.addLegend();
+        var A = "THESEUS";
+        var B = "HIPPOLYTA";
+        var lexicon = "AFINN";
+        this.readData(A, B, lexicon);
+        this.buildSvg('#svg1', A, B);
+
+        A = "LYSANDER";
+        B = "HERMIA";
+        this.readData(A, B, lexicon);
+        this.buildSvg('#svg2', A, B);
     }
 
-    private readData(A, B) {
-        this.sentimentAB = sentimentAB;
-        this.sentimentBA = sentimentBA;
-        //d3.csv("./sentiment_data.csv")
-          //.row(function(d) { return {scene: d.scene, sentiment_value: +d[A+'-'+B]}; })
-          //.get(function(error, rows) { console.log(rows); });
+    private readData(A, B, lexicon) {
+        if (lexicon == "AFINN") {
+            this.sentimentAB = sentiment_AFINN[A+'-'+B];
+            this.sentimentBA = sentiment_AFINN[B+'-'+A];
+        }
+        else {
+            this.sentimentAB = sentiment_BL[A+'-'+B];
+            this.sentimentBA = sentiment_BL[B+'-'+A];
+        }
     }
 
-    private buildSvg() {
-        this.svg = d3.select('svg')
+    private buildSvg(svgID, A, B) {
+        d3.select(svgID).append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", 350)
+            .attr("height", 200)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1)
+            .attr("fill", "none");
+
+        this.svg = d3.select(svgID)
             .append('g')
             .attr('class', 'line-and-dots')
             .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
+
+        this.addXandYAxis();
+        this.drawLineAndPath(this.sentimentAB, 'blue', 'circle');
+        this.drawLineAndPath(this.sentimentBA, 'red', 'rect');
+        this.addLegend(A, B);
     }
 
     private addXandYAxis() {
          // range of data configuring
          this.x = d3.scaleLinear().range([0, this.width]);
          this.y = d3.scaleLinear().range([this.height, 0]);
-         this.x.domain(d3.extent(sentimentAB, (d) => d.scene ));
-         this.y.domain(d3.extent(sentimentAB, (d) => d.sentiment_value ));
+         this.x.domain(d3.extent(this.sentimentAB.concat(this.sentimentBA), (d) => d.scene ));
+         this.y.domain(d3.extent(this.sentimentAB.concat(this.sentimentBA), (d) => d.sentiment_value ));
 
         // Configure the X Axis
         this.svg.append('g')
@@ -71,14 +91,28 @@ export class RelationshipComponent implements OnInit {
             .call(d3.axisLeft(this.y));
     }
 
+    private computePointSize (s) {
+        if (s == 0) {
+          return 0;
+        }
+        else if (s < 100) {
+          return 5;
+        }
+        else if (s < 200) {
+          return 7;
+        }
+        else if(s < 400) {
+          return 9;
+        }
+        else {
+          return 11;
+        }
+    }
+
     private drawLineAndPath(data, color, shape) {
         this.line = d3.line()
             .x( (d: any) => this.x(d.scene) )
             .y( (d: any) => this.y(d.sentiment_value) );
-        
-        this.r = d3.scaleLog().range([0, 10])
-            .domain(d3.extent(sentimentAB, (d) => d.speech_dist ))
-            .base(2)
 
         // Configuring line path
         this.svg.append('path')
@@ -97,7 +131,7 @@ export class RelationshipComponent implements OnInit {
               .enter()
               .append(shape)
               .attr("class", "points")
-              .attr("r", 5)
+              .attr("r", (d: any) => this.computePointSize(d.speech_dist))
               .attr("cx", (d: any) => this.x(d.scene))
               .attr("cy", (d: any) => this.y(d.sentiment_value) )
               .attr('fill', color)
@@ -111,39 +145,40 @@ export class RelationshipComponent implements OnInit {
               .enter()
               .append(shape)
               .attr("class", "points")
-              .attr("x", (d: any) => this.x(d.scene)-5)
-              .attr("y", (d: any) => this.y(d.sentiment_value)-5)
-              .attr("width", 10)
-              .attr("height",10)
+              .attr("x", (d: any) => this.x(d.scene)-this.computePointSize(d.speech_dist))
+              .attr("y", (d: any) => this.y(d.sentiment_value)-this.computePointSize(d.speech_dist))
+              .attr("width", (d: any) => 2*this.computePointSize(d.speech_dist))
+              .attr("height", (d: any) => 2*this.computePointSize(d.speech_dist))
               .attr('fill', color)
               .attr('stroke', 'none');
         }
     }
 
-    private addLegend() {
+    private addLegend(A, B) {
 
       this.svg.append("circle")
-        .attr("cx",20)
-        .attr("cy",180)
-        .attr("r", 6)
+        .attr("cx",0)
+        .attr("cy",170)
+        .attr("r", 5)
         .style("fill", "blue")
-      this.svg.append("circle")
-        .attr("cx",170)
-        .attr("cy",180)
-        .attr("r", 6)
+      this.svg.append("rect")
+        .attr("x",145)
+        .attr("y",165)
+        .attr("width", 10)
+        .attr("height", 10)
         .style("fill", "red")
       this.svg.append("text")
-        .attr("x", 30)
-        .attr("y", 180)
-        .text("LYSANDER -> HERMIA")
-        .style("font-size", "12px")
+        .attr("x", 10)
+        .attr("y", 170)
+        .text(A + " -> " +  B)
+        .style("font-size", "11px")
         .attr("alignment-baseline","middle")
       this.svg
         .append("text")
-        .attr("x", 180)
-        .attr("y", 180)
-        .text("HERMIA -> LYSANDER")
-        .style("font-size", "12px")
+        .attr("x", 160)
+        .attr("y", 170)
+        .text(B + " -> " +  A)
+        .style("font-size", "11px")
         .attr("alignment-baseline","middle")
     }
   
