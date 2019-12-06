@@ -1,3 +1,9 @@
+.play-header {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
 .sidebar {
   background-color: #EDEDED;
   height: 100vh;
@@ -6,23 +12,34 @@
 }
 
 .inner-sidebar {
-  padding: 15px 30px;
+  padding: 20px 20px;
+}
+
+.header-options {
+  font-size: 10px;
 }
 
 .sb-header {
   font-size: 16px;
   margin-top: 5px;
-  margin-bottom: 5px;
 }
 
 .sb-list-group {
   margin-left: 10px;
+  font-size: 11px;
 }
 
 .sb-list-item {
   padding: 0;
   border: 0px solid #ffffff;
-  font-size: 12px;
   margin: 0 0 2px;
   background-color: transparent;
+}
+
+.sb-selected-scene {
+  font-weight: bold;
+}
+
+.sb-selected-type {
+  font-weight: bold;
 }
