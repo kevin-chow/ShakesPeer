@@ -1,6 +1,29 @@
 
+<style>
+    .node {
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+    .node .selected {
+      stroke: black;
+    }
+    </style>
+
+
 <div>
-<h2>Character View</h2>
+    <!-- <p style="font-size: 10px;">
+        Two fairies, one a servant of Titania, the other a servant of Oberon, Puck, meet by chance in a glade. Puck tells Titania’s servant to be sure to keep Titania out of Oberon’s sight, for the two are very angry with each other. 
+        Oberon and Titania enter the glade. Titania accuses Oberon of loving Hippolyta and Oberon accuses Titania of loving Theseus.  
+        After Titania leaves, Oberon vows to take revenge on her. He sends Puck to seek a flower called love-in-idleness. He says that the flower’s juice, if rubbed on a sleeper’s eyelids, will cause the sleeper to fall in love with the first living thing he or she sees upon waking. Oberon announces that he will use this juice on Titania, hoping that she will fall in love with some ridiculous creature.
+        Oberon spots Demetrius and Helena entering the woods and makes himself invisible in order to listen in on their conversation. When Puck returns with the flower that Oberon asked him to find, Oberon instructs him to take some of the flower’s juice and put it on Demetrius’ eyes so that he will fall in love with Helena. Puck agrees to do it.
+    </p> -->
+
+  <svg  id="graphContainer"
+  width="100%"
+  height="100%"
+  class="associations"
+  #graphContainer>
+</svg>
 <form action="/action_page.php">
   <input type="radio" name="scnSelection" id="overview" (change) = "handleScnSelection($event, id)" > Overview<br>
   <input type="radio" name="scnSelection" id="a1s1" (change) = "handleScnSelection($event, id)" > Act 1, Scene 1<br>
@@ -14,13 +37,7 @@
   <input type="radio" name="scnSelection" id="a5s1" (change) = "handleScnSelection($event, id)" > Act 5, Scene 1<br>
   </form>
 
-<svg  id="graphContainer"
-      width="100%"
-      height="100%"
-      class="associations"
-      #graphContainer>
-</svg>
-</div>
+  </div>
 
 
 
