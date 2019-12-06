@@ -2,6 +2,10 @@ export class Filter {
   selectedScenes: string[];
   selectedCharacterTypes: string[];
 
+  sceneList: Scene[];
+  characterTypeList: CharacterType[];
+
+
   hoveredCharacter: any;
   hoveredRelationship: any;
 }

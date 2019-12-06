@@ -1,60 +1,9 @@
 <div class="container-fluid">
   <div class="row">
+
+    <!-- SIDEBAR VIEW -->
     <div style="padding:0" class="col-sm-2">
-
-      <!-- SIDEBAR VIEW -->
-      <div class="sidebar">
-        <div class="inner-sidebar">
-
-          <div class="play-header">A Midsummer Night's Dream</div>
-          <div style="font-size: 12px"> 1595, Comedy</div>
-          <div style="font-size: 12px">Include some summary info about the play here.</div>
-
-          <!-- SCENES -->
-          <div class="sb-header">Scenes</div>
-          <div class="header-options">[ <a href="#" (click)="toggleAllScenes(true)">All</a>
-            | <a href="#" (click)="toggleAllScenes(false)">None</a> ]
-          </div>
-          <ul class="sb-list-group list-group">
-            <li *ngFor="let scene of sceneList" class="sb-list-item list-group-item">
-              <a href="#" (click)="toggleScene(scene)"
-                 [ngClass]="{'sb-selected-scene': scene.selected}"> {{scene.displayName}} </a>
-            </li>
-          </ul>
-
-          <div class="sb-header">Character Types</div>
-          <div class="header-options">[ <a href="#" (click)="toggleAllTypes(true)">All</a>
-            | <a href="#" (click)="toggleAllTypes(false)">None</a> ]
-          </div>
-          <ul class="sb-list-group list-group">
-            <li *ngFor="let type of characterTypeList" class="sb-list-item list-group-item">
-              <a href="#" (click)="toggleType(type)"
-                 [ngClass]="{'sb-selected-type': type.selected}"> {{type.displayName}} </a>
-            </li>
-          </ul>
-
-          <div class="sb-header">
-            Characters <span class="header-options">(5 of 24)</span>
-          </div>
-
-          <ul class="sb-list-group list-group">
-            <li *ngFor="let character of characterList | slice:0:5; let i=index" class="sb-list-item list-group-item">
-              <a href="#">{{character.id}}</a>
-            </li>
-          </ul>
-
-          <div class="sb-header">Relationships</div>
-          <ul class="sb-list-group list-group">
-            <li class="sb-list-item list-group-item">
-              <a href="#">Titania <-> Lysander</a>
-            </li>
-            <li class="sb-list-item list-group-item">
-              <a href="#">Hippolyta <-> Helena</a>
-            </li>
-          </ul>
-
-        </div>
-      </div>
+      <app-sidebar></app-sidebar>
     </div>
 
     <!-- NETWORK VIEW -->
