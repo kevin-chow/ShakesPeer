@@ -17,9 +17,7 @@ export class SidebarComponent implements OnInit {
 
   constructor(private filterService: FilterService) {
     filterService.filter$.subscribe((newFilter) => {
-      console.log("filter was updated!");
       this.filter = newFilter;
-      console.log(this.filter.selectedCharacterTypes);
     });
   }
 
