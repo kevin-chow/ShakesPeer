@@ -45,7 +45,7 @@ export const allCharacters = [
   { id: "Quince",       type: 'actor', total: 864,  a1s1: 0,   a1s2: 337, a2s1: 0,   a2s2: 0,   a3s1: 272, a3s2: 0,   a4s1: 0,   a4s2: 59,  a5s1: 196 },
   { id: "Lysander",     type: 'lover', total: 1396, a1s1: 406, a1s2: 0,   a2s1: 0,   a2s2: 359, a3s1: 0,   a3s2: 477, a4s1: 75,  a4s2: 0,   a5s1: 79  },
   { id: "Helena",       type: 'lover', total: 1815, a1s1: 350, a1s2: 0,   a2s1: 292, a2s2: 256, a3s1: 0,   a3s2: 899, a4s1: 18,  a4s2: 0,   a5s1: 0   },
-  { id: "Puck",         type: 'fairy', total: 1378, a1s1: 0,   a1s2: 0,   a2s1: 273, a2s2: 105, a3s1: 92,  a3s2: 677, a4s1: 22,  a4s2: 0,   a5s1: 209 },
+  { id: "Robin",        type: 'fairy', total: 1378, a1s1: 0,   a1s2: 0,   a2s1: 273, a2s2: 105, a3s1: 92,  a3s2: 677, a4s1: 22,  a4s2: 0,   a5s1: 209 },
   { id: "First Fairy",  type: 'fairy', total: 44,   a1s1: 0,   a1s2: 0,   a2s1: 0,   a2s2: 44,  a3s1: 0,   a3s2: 0,   a4s1: 0,   a4s2: 0,   a5s1: 0   },
   { id: "Theseus",      type: 'other', total: 1720, a1s1: 467, a1s2: 0,   a2s1: 0,   a2s2: 0,   a3s1: 0,   a3s2: 0,   a4s1: 304, a4s2: 0,   a5s1: 949 },
   { id: "Cobweb",       type: 'fairy', total: 5,    a1s1: 0,   a1s2: 0,   a2s1: 0,   a2s2: 0,   a3s1: 8,   a3s2: 0,   a4s1: 1,   a4s2: 0,   a5s1: 0   },

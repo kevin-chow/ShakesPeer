@@ -1,4 +1,13 @@
 <div class="rel-view">
+
+  <div class="form-check">
+    <input class="rel-input form-check-input" type="checkbox" value="" id="oneWay"
+           [checked]="isOneWayOnly" (change)="isOneWayOnly = !isOneWayOnly; this.refreshGraphs();">
+    <label class="rel-label form-check-label" for="oneWay">
+      Hide one-way pairs
+    </label>
+  </div>
+
   <div #relationship id="relationship-viz" (window:resize)="onResize()"></div>
 <!--<h3>Sentiment Valence</h3>-->
 <!--<svg width="350" height="200" id="svg1"></svg>-->
