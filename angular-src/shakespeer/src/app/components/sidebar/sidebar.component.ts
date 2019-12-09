@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {allCharacters, CharacterType, Filter, Scene} from "../../models/filter.model";
+import {allCharacters, allOutwardSentiments, allInwardSentiments, CharacterType, Filter, Scene} from "../../models/filter.model";
 import {FilterService} from "../../services/filter.service";
 
 @Component({
@@ -12,6 +12,9 @@ export class SidebarComponent implements OnInit {
   filter: Filter;
   sceneList: Scene[] = [];
   characterTypeList: CharacterType[] = [];
+
+  ascOrder: boolean = false;
+  show: boolean = true;
 
   characterList: any[] = allCharacters;
 
@@ -63,6 +66,34 @@ export class SidebarComponent implements OnInit {
   toggleAllTypes(flag: boolean) {
     this.characterTypeList.forEach((type) => type.selected = flag);
     this.updateFilter();
+  }
+
+  sortListWC() {
+    this.characterList = allCharacters.sort((a, b) => (a.total < b.total) ? 1 : -1);
+    if (this.ascOrder) {
+      this.characterList.reverse();
+    }
+  }
+
+  sortListOS() {
+    this.characterList = allOutwardSentiments.sort((a, b) => (a.total < b.total) ? 1 : -1);
+    if (this.ascOrder) {
+      this.characterList.reverse();
+    }
+  }
+
+  sortListIS() {
+    this.characterList = allInwardSentiments.sort((a, b) => (a.total < b.total) ? 1 : -1);
+    if (this.ascOrder) {
+      this.characterList.reverse();
+    }
+  }
+
+  sortListOrd(asc) {
+    this.ascOrder = asc;
+    if (this.ascOrder) {
+      this.characterList.reverse();
+    }
   }
 
   updateFilter() {
