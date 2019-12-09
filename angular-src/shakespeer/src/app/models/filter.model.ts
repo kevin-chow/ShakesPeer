@@ -5,6 +5,7 @@ export class Filter {
   sceneList: Scene[];
   characterTypeList: CharacterType[];
 
+  selectedCharacters: string[];
 
   hoveredCharacter: any;
   hoveredRelationship: any;
