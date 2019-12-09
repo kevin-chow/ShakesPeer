@@ -11,7 +11,7 @@
     </div>
 
     <div *ngIf="showSummary">
-       <div style="font-size: 12px">It portrays the events surrounding the 
+       <div style="font-size: 11px">It portrays the events surrounding the 
       marriage of Theseus, the Duke of Athens, to Hippolyta 
       (the former queen of the Amazons). These include the adventures of
        four young Athenian lovers and a group of six amateur actors 
@@ -21,10 +21,9 @@
    
 
     <div class="sb-header">Statistics</div>
-    <div style="font-size: 12px">
-      Number of Acts: 5 Acts (9 Scenes)
-      Number of Characters: 24
-    </div>
+    <div style="font-size: 11px">Number of Acts: 5 Acts (9 Scenes)</div>
+    <div style="font-size: 11px">Number of Characters: 24</div>
+    
 
     <!-- SCENES -->
     <div class="sb-header">Scenes</div>
@@ -50,23 +49,18 @@
     </ul>
 
     <!-- CHARACTERS -->
-    <div class="sb-header">Characters
-      <span class="header-options"> 
-            [ <a href="#" (click)="show = !show">{{show ? 'Show more' : 'Show less'}}</a> ]
-      </span>
-    </div>
+    <div class="sb-header">Characters</div>
 
-    <div id="block_container1">
-
+    <div style="display: flex; flex-direction: row" align="justify">
       <div class = "header-options">
           <b> Sort by </b>
           <br>
-          <input type="radio" name="sort" id="wc" (change) = "sortListWC()"> Speech frequency<br>
-          <input type="radio" name="sort" id="os" (change) = "sortListOS()"> Outward Sentiment<br>
-          <input type="radio" name="sort" id="is" (change) = "sortListIS()"> Inward Sentiment<br>
+          <input type="radio" name="sort" id="wc" (change) = "sortList(1)"> Speech frequency<br>
+          <input type="radio" name="sort" id="os" (change) = "sortList(2)"> Outward Sentiment<br>
+          <input type="radio" name="sort" id="is" (change) = "sortList(3)"> Inward Sentiment<br>
       </div>
 
-      <div class = "header-options">
+      <div class = "header-options-right">
           <b> Order </b>
           <br>
           <input type="radio" name="order" id="dsc" (change) = "sortListOrd(false)"> Descending<br>
@@ -74,42 +68,49 @@
       </div>
     </div>
 
+    <div class="header-options">[ <a href="#" (click)="toggleAllCharacters(true)">All</a>
+      | <a href="#" (click)="toggleAllCharacters(false)">None</a> ]
+    </div>
+
     <!-- Show only a subset -->
     <div *ngIf="show; else elseBlock">
       <div id="block_container2">
 
         <ul class="sb-list-group list-group">
-        <li *ngFor="let character of characterList | slice:0:5; let i=index" class="sb-list-item list-group-item">
-          <a href="#">{{character.id}}</a>
+        <li *ngFor="let character of showCharacters() | slice:0:5; let i=index" class="sb-list-item list-group-item">
+          <a href="#" (click)="toggleCharacter(character)"
+           [ngClass]="{'sb-selected-type': character.selected}">{{character.id}}</a>
         </li>
         </ul>
 
         <ul class="sb-list-group-center list-group">
-        <li *ngFor="let character of characterList | slice:0:5; let i=index" class="sb-list-item list-group-item">
-          <a align="center">{{character.total}}</a>
+        <li *ngFor="let character of showCharacters() | slice:0:5; let i=index" class="sb-list-item list-group-item">
+          <a align="center" [ngClass]="{'sb-selected-type': character.selected}">{{character.total}}</a>
         </li>
         </ul>
-      </div>
+      </div> 
     </div>
 
     <ng-template #elseBlock>
-      <div id="block_container2">
+      <div id= "block_container2">
 
         <ul class="sb-list-group list-group">
-        <li *ngFor="let character of characterList" class="sb-list-item list-group-item">
-          <a href="#">{{character.id}}</a>
+        <li *ngFor="let character of showCharacters()" class="sb-list-item list-group-item">
+          <a href="#"  (click)="toggleCharacter(character)"
+           [ngClass]="{'sb-selected-type': character.selected}">{{character.id}}</a>
         </li>
         </ul>
 
         <ul class="sb-list-group-center list-group">
-        <li *ngFor="let character of characterList" class="sb-list-item list-group-item">
-          <a align="center">{{character.total}}</a>
+        <li *ngFor="let character of showCharacters()" class="sb-list-item list-group-item">
+          <a align="center" [ngClass]="{'sb-selected-type': character.selected}">{{character.total}}</a>
         </li>
         </ul>
       </div>
     </ng-template>
-
-    
+    <div class="header-options"> 
+            <a href="#" (click)="show = !show">{{show ? 'Show more' : 'Show less'}}</a>
+      </div>
     
 
 </div>
