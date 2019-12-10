@@ -7,7 +7,7 @@ export const type = {
 
 export var nodes =  [
     { id: "Hermia",       type: type.LOVER, radius: 0, visible: true, selected: false, total: 1286, a1s1: 432, a1s2: 0,   a2s1: 0,   a2s2: 205, a3s1: 0,   a3s2: 633, a4s1: 16,  a4s2: 0,   a5s1: 0 },
-    { id: "Mote",         type: type.FAIRY, radius: 0, visible: true, selected: false, total: 3,    a1s1: 0,   a1s2: 0,   a2s1: 0,   a2s2: 0,   a3s1: 7,   a3s2: 0,   a4s1: 0,   a4s2: 0,   a5s1: 0 },
+    { id: "Moth",         type: type.FAIRY, radius: 0, visible: true, selected: false, total: 3,    a1s1: 0,   a1s2: 0,   a2s1: 0,   a2s2: 0,   a3s1: 7,   a3s2: 0,   a4s1: 0,   a4s2: 0,   a5s1: 0 },
     { id: "Peaseblossom", type: type.FAIRY, radius: 0, visible: true, selected: false, total: 5,    a1s1: 0,   a1s2: 0,   a2s1: 0,   a2s2: 0,   a3s1: 8,   a3s2: 0,   a4s1: 1,   a4s2: 0,   a5s1: 0 },
     { id: "Titania",      type: type.FAIRY, radius: 0, visible: true, selected: false, total: 1082, a1s1: 0,   a1s2: 0,   a2s1: 545, a2s2: 67,  a3s1: 269, a3s2: 0,   a4s1: 176, a4s2: 0,   a5s1: 25 },
     { id: "Demetrius",    type: type.LOVER, radius: 0, visible: true, selected: false, total: 1069, a1s1: 13,  a1s2: 0,   a2s1: 190, a2s2: 18,  a3s1: 0,   a3s2: 485, a4s1: 198, a4s2: 0,   a5s1: 165 },
@@ -36,7 +36,7 @@ export var nodes =  [
 
 const characters = {
     HERMIA: nodes[0],
-    MOTE: nodes[1],
+    MOTH: nodes[1],
     PEASEBLOSSOM: nodes[2],
     TITANIA: nodes[3],
     DEMETRIUS: nodes[4],
@@ -67,7 +67,7 @@ export const links = [
     { source: characters.HERMIA, target: characters.HELENA, visible: true,    sentiment: 0.5, width: 0 },
     { source: characters.HERMIA, target: characters.THESEUS, visible: true,  sentiment: 0, width: 0 },
 
-    { source: characters.MOTE, target: characters.BOTTOM, visible: true,  total: 1, width: 0 },
+    { source: characters.MOTH, target: characters.BOTTOM, visible: true,  total: 1, width: 0 },
 
     { source: characters.PEASEBLOSSOM, target: characters.TITANIA, visible: true, sentiment: 0.5, width: 0},
     { source: characters.PEASEBLOSSOM, target: characters.BOTTOM, visible: true, sentiment: 1, width: 0},
@@ -76,7 +76,7 @@ export const links = [
     // { source: characters.TITANIA, target: characters.FIRSTFAIRY, sentiment: 1, total: 1 },
     // { source: characters.TITANIA, target: characters.SECONDFAIRY, sentiment: -1, total: -1},
     { source: characters.TITANIA, target: characters.BOTTOM, visible: true, sentiment: 1, width: 0},
-    { source: characters.TITANIA, target: characters.MOTE, visible: true, sentiment: 1, width: 0},
+    { source: characters.TITANIA, target: characters.MOTH, visible: true, sentiment: 1, width: 0},
     { source: characters.TITANIA, target: characters.PEASEBLOSSOM, visible: true, sentiment: 0.5, width: 0},
     { source: characters.TITANIA, target: characters.COBWEB, visible: true, sentiment: 1, width: 0},
     { source: characters.TITANIA, target: characters.MUSTARDSEED, visible: true, sentiment: 1, width: 0},
@@ -169,7 +169,7 @@ export const links = [
     { source: characters.BOTTOM, target: characters.STARVELING, visible: true, sentiment: 1 , width: 0},
     { source: characters.BOTTOM, target: characters.TITANIA, visible: true, sentiment: 1 , width: 0},
     { source: characters.BOTTOM, target: characters.COBWEB, visible: true, sentiment: 1 , width: 0},
-    { source: characters.BOTTOM, target: characters.MOTE, visible: true, sentiment: 1 , width: 0},
+    { source: characters.BOTTOM, target: characters.MOTH, visible: true, sentiment: 1 , width: 0},
     { source: characters.BOTTOM, target: characters.MUSTARDSEED, visible: true, sentiment: 1 , width: 0},
     { source: characters.BOTTOM, target: characters.PEASEBLOSSOM, visible: true, sentiment: 1 , width: 0},
     { source: characters.BOTTOM, target: characters.THESEUS, visible: true, sentiment: 1 , width: 0},

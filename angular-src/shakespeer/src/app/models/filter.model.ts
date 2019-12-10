@@ -5,8 +5,6 @@
 
   sceneList: Scene[];
   characterTypeList: CharacterType[];
-
-  selectedCharacters: string[];
 }
 
 export class Scene {

@@ -43,7 +43,7 @@ export class SidebarComponent implements OnInit {
     this.characterTypeList.push(new CharacterType('fairy', 'Fairy'));
     this.characterTypeList.push(new CharacterType('other', 'Other'));
 
-    this.characterList.forEach((character) => character.selected = true);
+    this.characterList.forEach((character) => character.selected = false);
     this.characterList.forEach((character) => 
       this.selectedCharacters[character.id] = character.selected);
     this.updateCharacter();

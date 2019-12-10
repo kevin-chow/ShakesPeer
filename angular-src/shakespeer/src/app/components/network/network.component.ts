@@ -22,7 +22,7 @@ export class NetworkComponent implements OnInit {
   maxLinkOffset = 75;
   minLinkOffset = 10;
   width = 0;
-  height = 800;
+  height = 850;
  
   // Hard-coded for now
   selectedCharacterTypes: string[] = [
@@ -60,11 +60,8 @@ export class NetworkComponent implements OnInit {
  
   ngOnInit(): void {
     this.filter = new Filter();
-    sceneAttribs.forEach(scene => {
-      this.selectedScns.push(scene.id);
-    });
+    sceneAttribs.forEach(scene => { this.selectedScns.push(scene.id); });
     this.maxWords = Math.max.apply(Math, nodes.map(function(n) { return n.total }));
-    console.log(this.maxWords);
     this.refreshView = false;
   }
  
@@ -80,9 +77,7 @@ export class NetworkComponent implements OnInit {
       if (ab[scene].speech_dist > 0) retVal.push(ab[scene]);
      }
     });
-    if (retVal.length > 0) {
-      return retVal;
-    }
+    if (retVal.length > 0) return retVal;
   }
   return null;
 }
@@ -90,6 +85,7 @@ export class NetworkComponent implements OnInit {
   handleSidebarSelection() {
    this.selectedScns = this.filter.selectedScenes;
    this.selectedCharacterTypes = this.filter.selectedCharacterTypes;
+   this.selectedCharacters = this.filter.selectedCharacters;
   }
  
 
@@ -97,12 +93,12 @@ export class NetworkComponent implements OnInit {
   reset() {
    if (this.svg == undefined) return;
    this.svg.selectAll("*").remove();
-   nodes.forEach(node => {
-    node.selected = false;
-   });
-   links.forEach(link => {
-    link['selected'] = false;
-   })
+   nodes.forEach(node => { 
+     node.selected = false;
+    });
+   links.forEach(link => { 
+     link['selected'] = false;
+    });
   }
  
  
@@ -234,7 +230,7 @@ export class NetworkComponent implements OnInit {
  
   setSvg() {
    this.svg = d3.select('#graphContainer')
-    .attr('height', 'calc(100vh - 30)')
+    .attr('height', '100vh')
     .attr('class', 'all')
     .attr('transform-origin', '50% 50% 0')
     .style('display', 'block');
@@ -242,15 +238,14 @@ export class NetworkComponent implements OnInit {
     this.svg.append('rect')
       .attr('width', '100%')
       .attr('height', '100%')
-      .style('stroke', 'lightgray')
       .style('fill-opacity', 0);
  
 
    // Sentiment valence legend
-   let colorWidth = 25;
-   let colorHeight = 20;
+   let colorWidth = 30;
+   let colorHeight = 25;
    let shiftRight = 0;
-   let leftPadding = 20;
+   let leftPadding = 50;
    this.svg.append('text')
     .text('Sentiment Valence')
     .attr('x', leftPadding)
@@ -281,9 +276,6 @@ export class NetworkComponent implements OnInit {
    // Handles to link and node element groups
    this.path = this.svg.append('svg:g').selectAll('path');
    this.circle = this.svg.append('svg:g').selectAll('g');
- 
-   this.svg
-    .attr('transform', 'translate(0, 15)');
 
   }
 
@@ -314,8 +306,10 @@ export class NetworkComponent implements OnInit {
    this.initDrag();
  
    this.filterService.filter$.subscribe(newFilter => {
+     if (this.filter != newFilter) {
+       this.refreshView = true;
+     }
      this.filter = newFilter;
-
      if (this.refreshView) {
       this.handleSidebarSelection();
       this.reset();
@@ -326,10 +320,8 @@ export class NetworkComponent implements OnInit {
       if (this.selectedScns.length > 0) {
        this.restart();
       }
-      this.refreshView = true;
     }
-    
-     });
+  });
     
    
 
@@ -347,19 +339,12 @@ export class NetworkComponent implements OnInit {
     let offsetMagnitude = d.width;
  
     let offsetPoint =
-        // this.computeIntersection(d.target.x, d.target.y, d.source.x, d.source.y, d.target.radius);
-    //  this.computeOffsetPoint(
-    //   d.target.x,
-    //   d.target.y,
-    //   d.source.x,
-    //   d.source.y,
-    //   10);
-        this.computeOffsetPoint(
-      d.target.x,
-      d.target.y,
-      (0.7 * d.target.x) + (0.3 * d.source.x),
-      (0.7 * d.target.y) + (0.3 * d.source.y),
-      7);
+      this.computeOffsetPoint(
+        d.target.x,
+        d.target.y,
+        (0.7 * d.target.x) + (0.3 * d.source.x),
+        (0.7 * d.target.y) + (0.3 * d.source.y),
+        7);
 
       let offsetPoint2 = 
       this.computeOffsetPoint(
@@ -429,7 +414,6 @@ export class NetworkComponent implements OnInit {
     this.filter.selectedScenes = this.selectedScns;
     this.filter.selectedCharacterTypes = this.selectedCharacterTypes;
     this.filterService.updateFilter(this.filter);
-    console.log(this.filter.selectedCharacters);
   }
  
   handleSelect(d) {
@@ -483,7 +467,7 @@ export class NetworkComponent implements OnInit {
      }
      return color;
     })
-    .style('opacity', (d) => (d.selected) ? 0.8 : 0.15)
+    .style('opacity', (d) => (d.selected) ? 0.8 : 0.2)
     .style('stroke', (d) => (d.selected) ? 'gray' : '');
  
  
@@ -512,6 +496,7 @@ export class NetworkComponent implements OnInit {
  
   // Update graph
   restart() {
+    var temp = this;
    this.path = this.path.data(links);
    this.path.exit().remove();
  
@@ -520,10 +505,14 @@ export class NetworkComponent implements OnInit {
     .attr('class', 'link')
     .style('stroke-width', '1px')
     .style('stroke-opacity', 0.1)
-    .style('opacity', 0.28)
-    // .style('opacity', 1.0)
-    .attr("fill", this.neutralColor)
+    .style('opacity', 0.2) 
+    .attr("fill", temp.neutralColor)
     .style('display', (d) => (d.visible) ? 'flex' : 'none');
+
+
+
+
+
  
    this.circle = this.circle.data(nodes, (d) => d.id);
  
@@ -533,7 +522,7 @@ export class NetworkComponent implements OnInit {
    // Add new nodes
    const g = this.circle.enter().append('svg:g');
  
-   var temp = this;
+   
    g.append('svg:circle')
     .attr('class', 'node')
     .attr('r', (d) => d.radius)
@@ -543,9 +532,7 @@ export class NetworkComponent implements OnInit {
      (d.type == type.ACTOR) ? this.actorColor : this.otherColor)
     .style('display', (d) => (d.visible) ? 'flex' : 'none')
     .style('stroke-width', '2px')
-    .style('stroke', 'white')
-    // .style('opacity', 0.1)
-   
+    .style('stroke', (d) => (d.selected) ? 'black' : 'white')
     .on('click', function(d) {
      temp.handleSelect(d);
     });
@@ -563,7 +550,6 @@ export class NetworkComponent implements OnInit {
    this.circle = g.merge(temp.circle)
  
     .call(temp.drag);
-   // .call(temp.zoom);
  
  
  
@@ -572,7 +558,7 @@ export class NetworkComponent implements OnInit {
     .nodes(nodes)
     .force('link').links(links);
  
-   this.force.alpha(1).restart();
+   this.force.alpha(0.75).restart();
  
  
   }

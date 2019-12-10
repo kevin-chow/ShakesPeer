@@ -12,22 +12,10 @@ import {sentiment_BL} from "./relationship_data";
 
 export class RelationshipComponent implements OnInit {
 
-
   filter: Filter;
   sentimentData: any[];
 
-    private margin = {top: 20, right: 20, bottom: 50, left: 20};
-    private width: number;
-    private height: number;
-    private x: any;
-    private y: any;
-    private svg: any;
-    private line: d3.line<[number, number]>; // this is line definition
-    private counter = 0;
-
-
   isOneWayOnly: boolean = true;
-
 
   @ViewChild('relationship')
   svgContainer: ElementRef;
@@ -58,32 +46,6 @@ export class RelationshipComponent implements OnInit {
       }
     }
     return pair;
-
-    handleScnSelection(e) {
-    
-    var lexicon = "AFINN";
-    if (e.target.checked) {
-      var selectedRlt = e.target.id;
-      console.log(selectedRlt);
-      var ind = selectedRlt.indexOf("-");
-      var A = selectedRlt.slice(0, ind);
-      var B = selectedRlt.slice(ind+1);
-      this.buildSvg('#svg1', A, B, lexicon, this.counter);
-      this.counter = this.counter+1; 
-    }
-    
-  }
-
-  constructor() { 
-      // configure margins and width/height of the graph
-   this.width = 350 - this.margin.left - this.margin.right;
-   this.height = 200 - this.margin.top - this.margin.bottom;}
-
-  ngOnInit() {}
-
-  ngAfterContentInit() {
-      
-
   }
 
   resetVisitedData() {
@@ -92,7 +54,6 @@ export class RelationshipComponent implements OnInit {
       value.visited = false;
     }
   }
-
 
   processSentimentData(): any[] {
     let characterPairList = [];
@@ -116,37 +77,9 @@ export class RelationshipComponent implements OnInit {
         characterPairList.push(characterPair);
         value.visited = true;
       }
-
-    private buildSvg(svgID, A, B, lexicon, i) {
-        
-        this.readData(A, B, lexicon);
-
-        var y = i * 200;
-        this.svg = d3.select(svgID).append("rect")
-            .attr("x", 0)
-            .attr("y", y)
-            .attr("width", 350)
-            .attr("height", 200)
-            .attr("stroke", "black")
-            .attr("stroke-width", 1)
-            .attr("fill", "none")
-            .attr("id", A+"-"+B)
-            .on("click", this.removeGraph(A+"-"+B));
-
-        var top = this.margin.top + y;
-        this.svg = d3.select(svgID).append('g')
-            .attr('class', 'line-and-dots')
-            .attr('transform', 'translate(' + this.margin.left + ',' + top + ')');
-
-        this.addXandYAxis();
-        this.drawLineAndPath(this.sentimentAB, 'blue', 'circle');
-        this.drawLineAndPath(this.sentimentBA, 'red', 'rect');
-        this.addLegend(A, B);
-
     }
     return characterPairList;
   }
-
 
   filterSentimentData(dataToBeFiltered): any[] {
     let filteredData = dataToBeFiltered;
@@ -154,29 +87,6 @@ export class RelationshipComponent implements OnInit {
       filteredData = filteredData.filter((d) => {
         return (d[0].data.length != 0) && (d[1].data.length != 0);
       });
-
-    private removeGraph(id) {
-        d3.select(id).exit().remove();
-    }
-
-    private addXandYAxis() {
-         // range of data configuring
-         this.x = d3.scaleLinear().range([0, this.width]);
-         this.y = d3.scaleLinear().range([this.height, 0]);
-         this.x.domain(d3.extent(this.sentimentAB.concat(this.sentimentBA), (d) => d.scene ));
-         this.y.domain(d3.extent(this.sentimentAB.concat(this.sentimentBA), (d) => d.sentiment_value ));
-
-        // Configure the X Axis
-        this.svg.append('g')
-            .attr('transform', 'translate(0,' + this.height + ')')
-            .attr('class', 'axis axis--x')
-            .call(d3.axisBottom(this.x));
-
-        // Configure the Y Axis
-        this.svg.append('g')
-            .attr('class', 'axis axis--y')
-            .call(d3.axisLeft(this.y));
-
     }
 
     let processedSelectedScenes: number[] = this.filter.selectedScenes.map((scene) => {
@@ -308,53 +218,7 @@ export class RelationshipComponent implements OnInit {
 
     const widthDivider = 2.25;
 
-
     this.relationshipSvg = d3.select('#relationship-viz').selectAll('svg');
-
-    private mouseover = function(d) {
-          var g = d3.select(this); // The node
-          // The class is used to remove the additional text later
-          var info = g.append('text')
-             .classed('info', true)
-             .attr('x', 20)
-             .attr('y', 10)
-             .text(d);
-      };
-
-    private mouseout = function() {
-          // Remove the info text on mouse out.
-          d3.select(this).select('text.info').remove()
-      };
-
-    private drawLineAndPath(data, color, shape) {
-        this.line = d3.line()
-            .x( (d: any) => this.x(d.scene) )
-            .y( (d: any) => this.y(d.sentiment_value) );
-
-        // Configuring line path
-        this.svg.append('path')
-            .datum(data)
-            .attr('class', 'line')
-            .attr('d', this.line)
-            .attr('stroke', color)
-            .attr('stroke-width', 2)
-            .attr('fill', 'none');
-
-        // Data dots
-        if (shape == 'circle') {
-          this.svg.append('g')
-              .selectAll("points")
-              .data(data)
-              .enter()
-              .append(shape)
-              .attr("class", "points")
-              .on("mouseover", this.mouseover)
-              .on("mouseout", this.mouseout)
-              .attr("r", (d: any) => this.computePointSize(d.speech_dist))
-              .attr("cx", (d: any) => this.x(d.scene))
-              .attr("cy", (d: any) => this.y(d.sentiment_value) )
-              .attr('fill', color)
-              .attr('stroke', 'none');
 
     this.relationshipSvg.data(finalData, function(d) { return d[0].id + d[1].id; })
       .enter().append('svg')
@@ -431,7 +295,6 @@ export class RelationshipComponent implements OnInit {
             .attr("stroke-width", "0.5px");
         }
 
-
         // Add all vertical reference lines
         for (let x = 0; x < 9; x+=1) {
           let pair1 = perSentimentData[0].data[x];
@@ -460,23 +323,6 @@ export class RelationshipComponent implements OnInit {
             .style("stroke-width", "1px")
             .style("stroke-dasharray", "4")
             .style("fill", "none");
-
-        else {
-          this.svg.append('g')
-              .selectAll("points")
-              .data(data)
-              .enter()
-              .append(shape)
-              .attr("class", "points")
-              .on("mouseover", (d: any) => this.mouseover(d.sentiment_value))
-              .on("mouseout", this.mouseout)
-              .attr("x", (d: any) => this.x(d.scene)-this.computePointSize(d.speech_dist))
-              .attr("y", (d: any) => this.y(d.sentiment_value)-this.computePointSize(d.speech_dist))
-              .attr("width", (d: any) => 2*this.computePointSize(d.speech_dist))
-              .attr("height", (d: any) => 2*this.computePointSize(d.speech_dist))
-              .attr('fill', color)
-              .attr('stroke', 'none');
-
         }
 
         // Add 0-horizontal reference line
