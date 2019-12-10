@@ -6,8 +6,7 @@
   sceneList: Scene[];
   characterTypeList: CharacterType[];
 
-  hoveredCharacter: any;
-  hoveredRelationship: any;
+  selectedCharacters: string[];
 }
 
 export class Scene {
