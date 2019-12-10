@@ -243,23 +243,23 @@ export class NetworkComponent implements OnInit {
    let colorWidth = 30;
    let colorHeight = 25;
    let shiftRight = 0;
-   let leftPadding = 50;
+   let leftPadding = 10;
    this.svg.append('text')
     .text('Sentiment Valence')
     .attr('x', leftPadding)
-    .attr('y', 45)
+    .attr('y', 25-5)
     .style('font-size', '10px');
    this.svg.append('text')
     .text('-ve')
     .attr('x', leftPadding)
-    .attr('y', 82)
+    .attr('y', 62-5)
     .style('font-size', '10px');
    for (let idx in this.divergeRB) {
     this.svg.append('rect')
      .attr('width', colorWidth)
      .attr('height', colorHeight)
      .attr('x', leftPadding + colorWidth * shiftRight)
-     .attr('y', 50)
+     .attr('y', 30-5)
      .attr('stroke', 'white')
      .attr('stroke-width', '2px')
      .attr('fill', this.divergeRB[idx]);
@@ -268,7 +268,7 @@ export class NetworkComponent implements OnInit {
    this.svg.append('text')
     .text('+ve')
     .attr('x', leftPadding + 6 + colorWidth * (shiftRight - 1))
-    .attr('y', 82)
+    .attr('y', 62-5)
     .style('font-size', '10px');
  
    // Handles to link and node element groups
