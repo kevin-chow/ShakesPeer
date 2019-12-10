@@ -13,6 +13,7 @@ import {sentiment_BL} from "./relationship_data";
 export class RelationshipComponent implements OnInit {
 
   filter: Filter;
+  hoverChar: string;
   sentimentData: any[];
 
   isOneWayOnly: boolean = true;
@@ -27,6 +28,10 @@ export class RelationshipComponent implements OnInit {
   constructor(private filterService: FilterService) {
     filterService.filter$.subscribe((newFilter) => {
       this.filter = newFilter;
+      this.refreshGraphs();
+    });
+    filterService.hover$.subscribe((newHover) => {
+      this.hoverChar = newHover;
       this.refreshGraphs();
     });
   }
@@ -86,6 +91,18 @@ export class RelationshipComponent implements OnInit {
     if (this.isOneWayOnly == true) {
       filteredData = filteredData.filter((d) => {
         return (d[0].data.length != 0) && (d[1].data.length != 0);
+      });
+    }
+
+    // Filter by selected characters on character view.
+    if (this.filter.selectedCharacters.length != 0) {
+      filteredData = filteredData.filter((d) => {
+        let chars1 = d[0].id.split("-");
+        let camelChars1 = chars1[0][0].toUpperCase() + chars1[0].slice(1).toLowerCase();
+        let camelChars2 = chars1[1][0].toUpperCase() + chars1[1].slice(1).toLowerCase();
+
+        return this.filter.selectedCharacters.includes(camelChars1) ||
+          this.filter.selectedCharacters.includes(camelChars2);
       });
     }
 
@@ -220,7 +237,7 @@ export class RelationshipComponent implements OnInit {
 
     this.relationshipSvg = d3.select('#relationship-viz').selectAll('svg');
 
-    this.relationshipSvg.data(finalData, function(d) { return d[0].id + d[1].id; })
+    let svgEnter = this.relationshipSvg.data(finalData, function(d) { return d[0].id + d[1].id; })
       .enter().append('svg')
       .attr('width', (this.width / widthDivider) + this.margin.left + this.margin.right)
       .attr('height', this.height + this.margin.top + this.margin.bottom)
@@ -352,9 +369,9 @@ export class RelationshipComponent implements OnInit {
           .attr('transform', `translate(0,-0.75)`)
           .call(yAxis);
 
-
         // Add bounding rectangle
         svg.append("rect")
+          .attr("class", "bounding")
           .attr("x", 0.5)
           .attr("y", -1)
           .attr("width", that.width / widthDivider - 1)
@@ -362,7 +379,6 @@ export class RelationshipComponent implements OnInit {
           .attr("fill", "none")
           .attr("stroke", "rgb(0, 0, 0, 0.8)")
           .attr("stroke-width", "1px");
-
 
         svg.append('g').selectAll('g')
           .data(perSentimentData)
@@ -394,7 +410,28 @@ export class RelationshipComponent implements OnInit {
       });
 
     this.relationshipSvg.data(finalData, function(d) { return d[0].id + d[1].id; }).exit().remove();
+
+    this.relationshipSvg = svgEnter.merge(this.relationshipSvg).each(function(perSentimentData) {
+      const svg = d3.select(this);
+      const chars1 = perSentimentData[0].id.split("-");
+      const chars2 = perSentimentData[1].id.split("-")
+
+      let boundStrokeWidth;
+      let camelChars1 = chars1[0][0].toUpperCase() + chars1[0].slice(1).toLowerCase();
+      let camelChars2 = chars1[1][0].toUpperCase() + chars1[1].slice(1).toLowerCase();
+
+      if (that.hoverChar === camelChars1 || that.hoverChar === camelChars2) {
+        boundStrokeWidth = "2px";
+      } else {
+        boundStrokeWidth = "1px";
+      }
+
+      svg.selectAll('.bounding')
+        .attr("stroke-width", boundStrokeWidth);
+    });
   }
+
+
 
   refreshGraphs() {
     this.resetVisitedData();

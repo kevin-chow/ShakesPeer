@@ -15,7 +15,6 @@ export class NetworkComponent implements OnInit {
 
   @ViewChild('graphContainer') graphContainer: ElementRef;
 
-  
   maxWords: number;
   maxRadius = 50;
   minRadius = 12;
@@ -57,7 +56,6 @@ export class NetworkComponent implements OnInit {
   .range(this.divergeRB);
 
   
- 
   ngOnInit(): void {
     this.filter = new Filter();
     sceneAttribs.forEach(scene => { this.selectedScns.push(scene.id); });
@@ -254,7 +252,7 @@ export class NetworkComponent implements OnInit {
    this.svg.append('text')
     .text('-ve')
     .attr('x', leftPadding)
-    .attr('y', 80)
+    .attr('y', 82)
     .style('font-size', '10px');
    for (let idx in this.divergeRB) {
     this.svg.append('rect')
@@ -270,7 +268,7 @@ export class NetworkComponent implements OnInit {
    this.svg.append('text')
     .text('+ve')
     .attr('x', leftPadding + 6 + colorWidth * (shiftRight - 1))
-    .attr('y', 80)
+    .attr('y', 82)
     .style('font-size', '10px');
  
    // Handles to link and node element groups
@@ -482,13 +480,15 @@ export class NetworkComponent implements OnInit {
  
  
  
- 
-   // if (d != undefined || d!= null) {
-   //   if (d.selected) {
-   //     console.log(d3.select(d.parentNode).raise());
-   //   } 
-   // }
- 
+ handleHover(d) {
+  var temp = this;
+  if (!temp.selectedCharacters.includes(d.id)) {
+    console.log(this.path);
+    
+    
+    
+  }
+ }
   
  
  
@@ -534,8 +534,64 @@ export class NetworkComponent implements OnInit {
     .style('stroke-width', '2px')
     .style('stroke', (d) => (d.selected) ? 'black' : 'white')
     .on('click', function(d) {
+      temp.filterService.updateHover("");
      temp.handleSelect(d);
+    })
+    .on('mouseover', function(d) {
+      if (temp.selectedCharacters.includes(d.id)) return;
+
+      temp.filterService.updateHover(d.id);
+
+      d3.select(this)
+        .style('stroke', function() {
+          if(!temp.selectedCharacters.includes(d.id)) {
+            return 'gray';
+          } else {
+            return 'black';
+          }
     });
+    temp.path
+    .style('fill', function(l) {
+      if (l !== undefined) {
+        if ((l.source.id == d.id) && (!temp.selectedCharacters.includes(l.source.id))) {
+          return temp.colors(l.sentiment);
+        } else if (temp.selectedCharacters.includes(l.source.id)) return temp.colors(l.sentiment);
+      }
+      return temp.neutralColor; 
+      
+    });
+  })
+
+  
+
+  .on('mouseout', function(d) {
+    if (temp.selectedCharacters.includes(d.id)) return;
+
+    temp.filterService.updateHover("");
+
+    d3.select(this)
+      .style('stroke', function() {
+        if (temp.selectedCharacters.includes(d.id)) {
+          return 'black';
+        } else {
+          return 'white';
+        }
+      });
+
+      temp.path
+      .style('fill', function(l) {
+        if (l !== undefined) {
+          if ((l.source.id == d.id) && (!temp.selectedCharacters.includes(l.source.id))) {
+            return temp.neutralColor;
+          } else if (temp.selectedCharacters.includes(l.source.id)) return temp.colors(l.sentiment);
+        }
+        return temp.neutralColor; 
+        
+      });
+   
+    
+
+  });
  
  
    g.append('svg:text')
@@ -545,6 +601,7 @@ export class NetworkComponent implements OnInit {
     .attr("text-anchor", "middle")
     .text((d) => d.id)
     .style('font-size', '10px')
+     .style('pointer-events', 'none')
     .style('display', (d) => (d.visible) ? 'flex' : 'none');
  
    this.circle = g.merge(temp.circle)

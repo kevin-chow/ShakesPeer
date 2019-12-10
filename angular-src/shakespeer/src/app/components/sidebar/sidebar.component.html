@@ -21,7 +21,8 @@
    
 
     <div class="sb-header">Statistics</div>
-    <div style="font-size: 11px">Number of Acts: 5 Acts (9 Scenes)</div>
+    <div style="font-size: 11px">Number of Acts: 5</div>
+    <div style="font-size: 11px">Number of Scenes: 9</div>
     <div style="font-size: 11px">Number of Characters: 24</div>
     
 
@@ -51,17 +52,17 @@
     <!-- CHARACTERS -->
     <div class="sb-header">Characters</div>
 
-    <div style="display: flex; flex-direction: row" align="justify">
+    <div style="display: flex; flex-direction: row; margin-bottom: 3px;" align="justify">
       <div class = "header-options">
-          <b> Sort by </b>
+          <b> Sort by: </b>
           <br>
           <input type="radio" name="sort" id="wc" (change) = "sortList(1)"> Speech frequency<br>
-          <input type="radio" name="sort" id="os" (change) = "sortList(2)"> Outward Sentiment<br>
-          <input type="radio" name="sort" id="is" (change) = "sortList(3)"> Inward Sentiment<br>
+          <input type="radio" name="sort" id="os" (change) = "sortList(2)"> Outward sentiment<br>
+          <input type="radio" name="sort" id="is" (change) = "sortList(3)"> Inward sentiment<br>
       </div>
 
       <div class = "header-options-right">
-          <b> Order </b>
+          <b> Order: </b>
           <br>
           <input type="radio" name="order" id="dsc" (change) = "sortListOrd(false)"> Descending<br>
           <input type="radio" name="order" id="asc" (change) = "sortListOrd(true)"> Ascending<br>
