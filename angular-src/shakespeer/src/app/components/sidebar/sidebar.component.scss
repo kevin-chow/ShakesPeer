@@ -1,3 +1,4 @@
+  
 .play-header {
   font-size: 16px;
   font-weight: bold;
@@ -6,7 +7,7 @@
 
 .sidebar {
   background-color: #EDEDED;
-  height: 100vh;
+  height: 120vh;
   padding: 0;
   margin: 0;
 }
@@ -19,6 +20,11 @@
   font-size: 10px;
 }
 
+.header-options-right {
+  font-size: 10px;
+  margin-left: 20px;
+}
+
 .sb-header {
   font-size: 16px;
   margin-top: 5px;
@@ -29,11 +35,30 @@
   font-size: 11px;
 }
 
+.sb-list-group-center {
+  margin-left: 10px;
+  font-size: 11px;
+  text-align: center;
+}
+
 .sb-list-item {
   padding: 0;
   border: 0px solid #ffffff;
   margin: 0 0 2px;
   background-color: transparent;
+}
+
+.sb-list-item-center {
+  padding: 0;
+  border: 0px solid #ffffff;
+  margin: 0 0 2px;
+  background-color: transparent;
+}
+
+#block_container2 {
+    display: flex;
+    align-items: stretch;
+    justify-content: left;
 }
 
 .sb-selected-scene {
