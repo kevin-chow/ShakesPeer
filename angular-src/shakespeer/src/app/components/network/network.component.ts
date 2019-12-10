@@ -15,7 +15,6 @@ export class NetworkComponent implements OnInit {
 
   @ViewChild('graphContainer') graphContainer: ElementRef;
 
-  
   maxWords: number;
   maxRadius = 50;
   minRadius = 12;
@@ -253,7 +252,7 @@ export class NetworkComponent implements OnInit {
    this.svg.append('text')
     .text('-ve')
     .attr('x', leftPadding)
-    .attr('y', 80)
+    .attr('y', 82)
     .style('font-size', '10px');
    for (let idx in this.divergeRB) {
     this.svg.append('rect')
@@ -269,7 +268,7 @@ export class NetworkComponent implements OnInit {
    this.svg.append('text')
     .text('+ve')
     .attr('x', leftPadding + 6 + colorWidth * (shiftRight - 1))
-    .attr('y', 80)
+    .attr('y', 82)
     .style('font-size', '10px');
  
    // Handles to link and node element groups
@@ -535,10 +534,13 @@ export class NetworkComponent implements OnInit {
     .style('stroke-width', '2px')
     .style('stroke', (d) => (d.selected) ? 'black' : 'white')
     .on('click', function(d) {
+      temp.filterService.updateHover("");
      temp.handleSelect(d);
     })
     .on('mouseover', function(d) {
       if (temp.selectedCharacters.includes(d.id)) return;
+
+      temp.filterService.updateHover(d.id);
 
       d3.select(this)
         .style('stroke', function() {
@@ -564,6 +566,9 @@ export class NetworkComponent implements OnInit {
 
   .on('mouseout', function(d) {
     if (temp.selectedCharacters.includes(d.id)) return;
+
+    temp.filterService.updateHover("");
+
     d3.select(this)
       .style('stroke', function() {
         if (temp.selectedCharacters.includes(d.id)) {
@@ -596,6 +601,7 @@ export class NetworkComponent implements OnInit {
     .attr("text-anchor", "middle")
     .text((d) => d.id)
     .style('font-size', '10px')
+     .style('pointer-events', 'none')
     .style('display', (d) => (d.visible) ? 'flex' : 'none');
  
    this.circle = g.merge(temp.circle)

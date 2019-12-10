@@ -6,16 +6,24 @@
 }
 
 .sidebar {
-  background-color: #EDEDED;
+  background-color: whitesmoke;
 
-  height: 100%;
+  height: 100vh;
+  overflow-y: scroll;
+
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
 
   padding: 0;
   margin: 0;
 }
 
+.sidebar::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
 .inner-sidebar {
-  padding: 20px 20px;
+  padding: 15px 15px;
 }
 
 .header-options {
@@ -24,7 +32,7 @@
 
 .header-options-right {
   font-size: 10px;
-  margin-left: 20px;
+  margin-left: 10px;
 }
 
 .sb-header {
