@@ -1,8 +1,9 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import * as d3 from 'd3';
 import {FilterService} from "../../services/filter.service";
 import {Filter, allCharacters} from "../../models/filter.model";
 import {sentiment_BL} from "./relationship_data";
+
+import * as d3 from 'd3';
 
 @Component({
   selector: 'app-relationship',
@@ -246,6 +247,23 @@ export class RelationshipComponent implements OnInit {
       .each(function(perSentimentData) {
         const svg = d3.select(this);
 
+        // Add tooltips
+        let tip = d3.select("body").append("div")
+          .attr("class", "tooltip")
+          .style("opacity", 0);
+
+        tip.style('border-radius', '4px');
+        tip.style('padding-left', '5px');
+        tip.style('padding-right', '5px');
+        tip.style('padding-bottom', '5px');
+        tip.style('padding-top', '5px');
+        tip.style('font-size', '10.5px');
+        tip.style('width', '150px');
+        tip.style('line-height', '12px');
+        tip.style('background', 'rgba(0, 0, 0, 0.8)');
+        tip.style('color', '#fff');
+        tip.style('pointer-events', 'none');
+
         const xScene = d3.scaleBand().domain([1, 2, 3, 4, 5, 6, 7, 8, 9]).rangeRound([0, that.width / widthDivider], .5);
         const xCharacter = d3.scaleBand().domain(d3.range(2)).range([2, xScene.bandwidth() - 2]);
         const y = d3.scaleLinear().domain([minSentiment, maxSentiment]).range([that.height, 0]);
@@ -316,18 +334,56 @@ export class RelationshipComponent implements OnInit {
         for (let x = 0; x < 9; x+=1) {
           let pair1 = perSentimentData[0].data[x];
           let pair2 = perSentimentData[1].data[x];
+
+          // Draw all the rectangles on the background of the chart.
           if ((!pair1 || pair1.speech_dist == 0) && (!pair2 || pair2.speech_dist == 0)) {
             svg.append("rect")
               .attr("x", xScene(x+1))
               .attr("width", xScene.bandwidth())
               .attr("height", that.height + "px")
-              .attr("fill", "rgb(220, 220, 220, 0.3)");
+              .attr("fill", "rgb(220, 220, 220, 0.3)")
+              .on('mousemove', (d) => {
+                tip.transition()
+                  .duration(0)
+                  .style("opacity", .9);
+                let tipWidth = tip.node().getBoundingClientRect().width;
+                tip.html('<strong>' + that.formatSceneNumber(x+1) + '</strong><br>'
+                  + chars1[0] + " --> " + chars1[1] + '<br>'
+                  + "&ensp;" + pair1.speech_dist + " words, " + pair1.sentiment_value + " sentiment" + '<br>'
+                  + chars2[0] + " --> " + chars2[1] + '<br>'
+                  + "&ensp;" + pair2.speech_dist + " words, " + pair2.sentiment_value + " sentiment" + '<br>')
+                  .style("left", (d3.event.pageX) - (tipWidth / 2) + "px")
+                  .style("top", (d3.event.pageY + 20) + "px");
+              })
+              .on('mouseout', (d) => {
+                tip.transition()
+                  .duration(0)
+                  .style("opacity", 0);
+              });
           } else {
             svg.append("rect")
               .attr("x", xScene(x+1))
               .attr("width", xScene.bandwidth())
               .attr("height", that.height + "px")
-              .attr("fill", "white");
+              .attr("fill", "white")
+              .on('mousemove', (d) => {
+                tip.transition()
+                  .duration(0)
+                  .style("opacity", .9);
+                let tipWidth = tip.node().getBoundingClientRect().width;
+                tip.html('<strong>' + that.formatSceneNumber(x+1) + '</strong><br>'
+                   + chars1[0] + " --> " + chars1[1] + '<br>'
+                   + "&ensp;" + pair1.speech_dist + " words, " + pair1.sentiment_value + " sentiment" + '<br>'
+                   + chars2[0] + " --> " + chars2[1] + '<br>'
+                   + "&ensp;" + pair2.speech_dist + " words, " + pair2.sentiment_value + " sentiment" + '<br>')
+                  .style("left", (d3.event.pageX) - (tipWidth / 2) + "px")
+                  .style("top", (d3.event.pageY + 20) + "px");
+              })
+              .on('mouseout', (d) => {
+                tip.transition()
+                  .duration(0)
+                  .style("opacity", 0);
+              });
           }
 
           if (x == 8) continue;
@@ -339,6 +395,7 @@ export class RelationshipComponent implements OnInit {
             .style("stroke", "rgb(170, 170, 170, 0.3)")
             .style("stroke-width", "1px")
             .style("stroke-dasharray", "4")
+            .style('pointer-events', 'none')
             .style("fill", "none");
         }
 
@@ -350,6 +407,7 @@ export class RelationshipComponent implements OnInit {
           .attr("y2", y(0))
           .style("stroke", "rgb(170, 170, 170, 0.8)")
           .style("stroke-width", "1px")
+          .style('pointer-events', 'none')
           .style("fill", "none");
 
         // Add the x axis (top)
@@ -383,6 +441,7 @@ export class RelationshipComponent implements OnInit {
         svg.append('g').selectAll('g')
           .data(perSentimentData)
           .enter().append('g')
+          .style('pointer-events', 'none')
           .style('fill', (d, i) => z(i))
           .attr('transform', (d, i) => {
             return "translate(" + xCharacter(i) + ",0)";
@@ -414,7 +473,7 @@ export class RelationshipComponent implements OnInit {
     this.relationshipSvg = svgEnter.merge(this.relationshipSvg).each(function(perSentimentData) {
       const svg = d3.select(this);
       const chars1 = perSentimentData[0].id.split("-");
-      const chars2 = perSentimentData[1].id.split("-")
+      const chars2 = perSentimentData[1].id.split("-");
 
       let boundStrokeWidth;
       let camelChars1 = chars1[0][0].toUpperCase() + chars1[0].slice(1).toLowerCase();
@@ -431,7 +490,39 @@ export class RelationshipComponent implements OnInit {
     });
   }
 
-
+  formatSceneNumber(sceneNum): string {
+    switch (sceneNum) {
+      case 1:
+        return "Act 1, Scene 1";
+        break;
+      case 2:
+        return "Act 1, Scene 2";
+        break;
+      case 3:
+        return "Act 2, Scene 1";
+        break;
+      case 4:
+        return "Act 2, Scene 2";
+        break;
+      case 5:
+        return "Act 3, Scene 1";
+        break;
+      case 6:
+        return "Act 3, Scene 2";
+        break;
+      case 7:
+        return "Act 4, Scene 1";
+        break;
+      case 8:
+        return "Act 4, Scene 2";
+        break;
+      case 9:
+        return "Act 5, Scene 1";
+        break;
+      default:
+        return "";
+    }
+  }
 
   refreshGraphs() {
     this.resetVisitedData();
