@@ -15,6 +15,7 @@ export class SidebarComponent implements OnInit {
   ascOrder: boolean = false;
   show: boolean = true;
 
+  characterAppearList: any[] = allCharacters;
   characterList: any[] = allCharacters;
   selectedCharacters: any = {};
 
@@ -43,7 +44,7 @@ export class SidebarComponent implements OnInit {
     this.characterTypeList.push(new CharacterType('fairy', 'Fairy'));
     this.characterTypeList.push(new CharacterType('other', 'Other'));
 
-    this.characterList.forEach((character) => character.selected = false);
+    this.characterList.forEach((character) => character.selected = true);
     this.characterList.forEach((character) => 
       this.selectedCharacters[character.id] = character.selected);
     this.updateCharacter();
@@ -94,7 +95,7 @@ export class SidebarComponent implements OnInit {
     this.characterList.forEach((character) => 
       this.sceneList.forEach((scene) =>
         this.characterTypeList.forEach((type) =>
-        (character[scene.id] != 0 && scene.selected && 
+        (this.characterAppearList[scene.id] != 0 && scene.selected && 
          character.type == type.id && type.selected ? 
           character.show = true :
           character.show = character.show))));
