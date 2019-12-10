@@ -57,7 +57,6 @@ export class NetworkComponent implements OnInit {
   .range(this.divergeRB);
 
   
- 
   ngOnInit(): void {
     this.filter = new Filter();
     sceneAttribs.forEach(scene => { this.selectedScns.push(scene.id); });
@@ -482,13 +481,15 @@ export class NetworkComponent implements OnInit {
  
  
  
- 
-   // if (d != undefined || d!= null) {
-   //   if (d.selected) {
-   //     console.log(d3.select(d.parentNode).raise());
-   //   } 
-   // }
- 
+ handleHover(d) {
+  var temp = this;
+  if (!temp.selectedCharacters.includes(d.id)) {
+    console.log(this.path);
+    
+    
+    
+  }
+ }
   
  
  
@@ -535,7 +536,57 @@ export class NetworkComponent implements OnInit {
     .style('stroke', (d) => (d.selected) ? 'black' : 'white')
     .on('click', function(d) {
      temp.handleSelect(d);
+    })
+    .on('mouseover', function(d) {
+      if (temp.selectedCharacters.includes(d.id)) return;
+
+      d3.select(this)
+        .style('stroke', function() {
+          if(!temp.selectedCharacters.includes(d.id)) {
+            return 'gray';
+          } else {
+            return 'black';
+          }
     });
+    temp.path
+    .style('fill', function(l) {
+      if (l !== undefined) {
+        if ((l.source.id == d.id) && (!temp.selectedCharacters.includes(l.source.id))) {
+          return temp.colors(l.sentiment);
+        } else if (temp.selectedCharacters.includes(l.source.id)) return temp.colors(l.sentiment);
+      }
+      return temp.neutralColor; 
+      
+    });
+  })
+
+  
+
+  .on('mouseout', function(d) {
+    if (temp.selectedCharacters.includes(d.id)) return;
+    d3.select(this)
+      .style('stroke', function() {
+        if (temp.selectedCharacters.includes(d.id)) {
+          return 'black';
+        } else {
+          return 'white';
+        }
+      });
+
+      temp.path
+      .style('fill', function(l) {
+        if (l !== undefined) {
+          if ((l.source.id == d.id) && (!temp.selectedCharacters.includes(l.source.id))) {
+            return temp.neutralColor;
+          } else if (temp.selectedCharacters.includes(l.source.id)) return temp.colors(l.sentiment);
+        }
+        return temp.neutralColor; 
+        
+      });
+   
+    
+
+  });
  
  
    g.append('svg:text')
