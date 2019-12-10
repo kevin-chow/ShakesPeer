@@ -272,7 +272,7 @@ export class RelationshipComponent implements OnInit {
         const xAxisBottom = d3.axisBottom().scale(xScene);
         const yAxis = d3.axisLeft().scale(y).ticks(2);
         yAxis.tickValues(y.ticks(2).concat(y.domain()));
-        const z = d3.scaleOrdinal().range(["#98abc5", "#8a89a6"]);
+        const z = d3.scaleOrdinal().range(["gray", "DarkGray"]);
 
         const chars1 = perSentimentData[0].id.split("-");
         const chars2 = perSentimentData[1].id.split("-");
@@ -287,6 +287,7 @@ export class RelationshipComponent implements OnInit {
           //   .attr("text-anchor","middle");
 
           svg.append("text")
+            .attr("class", "textHeader")
             .attr("x", (that.width / widthDivider) / 2)
             .attr("y", -9)
             .text(chars1[0] + " <--> " + chars1[1])
@@ -299,7 +300,7 @@ export class RelationshipComponent implements OnInit {
             .attr("y", -15)
             .attr("width", 10)
             .attr("height", 10)
-            .attr("fill", "#98abc5")
+            .attr("fill", "gray")
             .attr("stroke", "black")
             .attr("stroke-width", "0.5px");
 
@@ -308,11 +309,12 @@ export class RelationshipComponent implements OnInit {
             .attr("y", -15)
             .attr("width", 10)
             .attr("height", 10)
-            .attr("fill", "#8a89a6")
+            .attr("fill", "DarkGray")
             .attr("stroke", "black")
             .attr("stroke-width", "0.5px");
         } else {
           svg.append("text")
+            .attr("class", "textHeader")
             .attr("x", (that.width / widthDivider) / 2)
             .attr("y", -9)
             .text(chars1[0] + " --> " + chars1[1])
@@ -325,7 +327,7 @@ export class RelationshipComponent implements OnInit {
             .attr("y", -15)
             .attr("width", 10)
             .attr("height", 10)
-            .attr("fill", "#98abc5")
+            .attr("fill", "gray")
             .attr("stroke", "black")
             .attr("stroke-width", "0.5px");
         }
@@ -338,27 +340,42 @@ export class RelationshipComponent implements OnInit {
           // Draw all the rectangles on the background of the chart.
           if ((!pair1 || pair1.speech_dist == 0) && (!pair2 || pair2.speech_dist == 0)) {
             svg.append("rect")
+              .attr("class", "sceneRect")
               .attr("x", xScene(x+1))
               .attr("width", xScene.bandwidth())
               .attr("height", that.height + "px")
-              .attr("fill", "rgb(220, 220, 220, 0.3)")
+              .attr("fill", "rgb(220, 220, 220, 0.1)")
               .on('mousemove', (d) => {
                 tip.transition()
                   .duration(0)
                   .style("opacity", .9);
                 let tipWidth = tip.node().getBoundingClientRect().width;
-                tip.html('<strong>' + that.formatSceneNumber(x+1) + '</strong><br>'
-                  + chars1[0] + " --> " + chars1[1] + '<br>'
-                  + "&ensp;" + pair1.speech_dist + " words, " + pair1.sentiment_value + " sentiment" + '<br>'
-                  + chars2[0] + " --> " + chars2[1] + '<br>'
-                  + "&ensp;" + pair2.speech_dist + " words, " + pair2.sentiment_value + " sentiment" + '<br>')
-                  .style("left", (d3.event.pageX) - (tipWidth / 2) + "px")
-                  .style("top", (d3.event.pageY + 20) + "px");
+
+                if (chars2[0] && chars2[1]) {
+                  tip.html('<strong>' + that.formatSceneNumber(x+1) + '</strong><br>'
+                    + chars1[0] + " --> " + chars1[1] + '<br>'
+                    + "&ensp;" + pair1.speech_dist + " words, " + pair1.sentiment_value + " sentiment" + '<br>'
+                    + chars2[0] + " --> " + chars2[1] + '<br>'
+                    + "&ensp;" + pair2.speech_dist + " words, " + pair2.sentiment_value + " sentiment" + '<br>')
+                    .style("left", (d3.event.pageX) - (tipWidth / 2) + "px")
+                    .style("top", (d3.event.pageY + 20) + "px");
+                } else {
+                  tip.html('<strong>' + that.formatSceneNumber(x+1) + '</strong><br>'
+                    + chars1[0] + " --> " + chars1[1] + '<br>'
+                    + "&ensp;" + pair1.speech_dist + " words, " + pair1.sentiment_value + " sentiment" + '<br>')
+                    .style("left", (d3.event.pageX) - (tipWidth / 2) + "px")
+                    .style("top", (d3.event.pageY + 20) + "px");
+                }
+                svg.selectAll('.bounding').attr("stroke-width", "2px");
+                svg.selectAll('.textHeader').attr("font-weight", "bold");
               })
               .on('mouseout', (d) => {
                 tip.transition()
                   .duration(0)
                   .style("opacity", 0);
+
+                svg.selectAll('.bounding').attr("stroke-width", "1px");
+                svg.selectAll('.textHeader').attr("font-weight", "normal");
               });
           } else {
             svg.append("rect")
@@ -371,18 +388,32 @@ export class RelationshipComponent implements OnInit {
                   .duration(0)
                   .style("opacity", .9);
                 let tipWidth = tip.node().getBoundingClientRect().width;
-                tip.html('<strong>' + that.formatSceneNumber(x+1) + '</strong><br>'
-                   + chars1[0] + " --> " + chars1[1] + '<br>'
-                   + "&ensp;" + pair1.speech_dist + " words, " + pair1.sentiment_value + " sentiment" + '<br>'
-                   + chars2[0] + " --> " + chars2[1] + '<br>'
-                   + "&ensp;" + pair2.speech_dist + " words, " + pair2.sentiment_value + " sentiment" + '<br>')
-                  .style("left", (d3.event.pageX) - (tipWidth / 2) + "px")
-                  .style("top", (d3.event.pageY + 20) + "px");
+
+                if (chars2[0] && chars2[1]) {
+                  tip.html('<strong>' + that.formatSceneNumber(x+1) + '</strong><br>'
+                    + chars1[0] + " --> " + chars1[1] + '<br>'
+                    + "&ensp;" + pair1.speech_dist + " words, " + pair1.sentiment_value + " sentiment" + '<br>'
+                    + chars2[0] + " --> " + chars2[1] + '<br>'
+                    + "&ensp;" + pair2.speech_dist + " words, " + pair2.sentiment_value + " sentiment" + '<br>')
+                    .style("left", (d3.event.pageX) - (tipWidth / 2) + "px")
+                    .style("top", (d3.event.pageY + 20) + "px");
+                } else {
+                  tip.html('<strong>' + that.formatSceneNumber(x+1) + '</strong><br>'
+                    + chars1[0] + " --> " + chars1[1] + '<br>'
+                    + "&ensp;" + pair1.speech_dist + " words, " + pair1.sentiment_value + " sentiment" + '<br>')
+                    .style("left", (d3.event.pageX) - (tipWidth / 2) + "px")
+                    .style("top", (d3.event.pageY + 20) + "px");
+                }
+                svg.selectAll('.bounding').attr("stroke-width", "2px");
+                svg.selectAll('.textHeader').attr("font-weight", "bold");
               })
               .on('mouseout', (d) => {
                 tip.transition()
                   .duration(0)
                   .style("opacity", 0);
+
+                svg.selectAll('.bounding').attr("stroke-width", "1px");
+                svg.selectAll('.textHeader').attr("font-weight", "normal");
               });
           }
 
@@ -476,17 +507,22 @@ export class RelationshipComponent implements OnInit {
       const chars2 = perSentimentData[1].id.split("-");
 
       let boundStrokeWidth;
+      let headerFontWeight;
       let camelChars1 = chars1[0][0].toUpperCase() + chars1[0].slice(1).toLowerCase();
       let camelChars2 = chars1[1][0].toUpperCase() + chars1[1].slice(1).toLowerCase();
 
       if (that.hoverChar === camelChars1 || that.hoverChar === camelChars2) {
         boundStrokeWidth = "2px";
+        headerFontWeight = "bold";
       } else {
         boundStrokeWidth = "1px";
+        headerFontWeight = "normal";
       }
 
       svg.selectAll('.bounding')
         .attr("stroke-width", boundStrokeWidth);
+      svg.selectAll('.textHeader')
+        .attr("font-weight", headerFontWeight);
     });
   }
 

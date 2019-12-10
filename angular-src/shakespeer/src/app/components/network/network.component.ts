@@ -267,7 +267,7 @@ export class NetworkComponent implements OnInit {
    }
    this.svg.append('text')
     .text('+ve')
-    .attr('x', leftPadding + 6 + colorWidth * (shiftRight - 1))
+    .attr('x', leftPadding + 10 + colorWidth * (shiftRight - 1))
     .attr('y', 62-5)
     .style('font-size', '10px');
  

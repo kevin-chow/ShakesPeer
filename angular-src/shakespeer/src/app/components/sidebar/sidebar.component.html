@@ -56,7 +56,7 @@
       <div class = "header-options">
           <b> Sort by: </b>
           <br>
-          <input type="radio" name="sort" id="wc" (change) = "sortList(1)"> Speech frequency<br>
+          <input type="radio" name="sort" id="wc" checked (change) = "sortList(1)"> Speech frequency<br>
           <input type="radio" name="sort" id="os" (change) = "sortList(2)"> Outward sentiment<br>
           <input type="radio" name="sort" id="is" (change) = "sortList(3)"> Inward sentiment<br>
       </div>
@@ -64,14 +64,14 @@
       <div class = "header-options-right">
           <b> Order: </b>
           <br>
-          <input type="radio" name="order" id="dsc" (change) = "sortListOrd(false)"> Descending<br>
+          <input type="radio" name="order" id="dsc" checked (change) = "sortListOrd(false)"> Descending<br>
           <input type="radio" name="order" id="asc" (change) = "sortListOrd(true)"> Ascending<br>
       </div>
     </div>
 
-    <div class="header-options">[ <a href="#" (click)="toggleAllCharacters(true)">All</a>
-      | <a href="#" (click)="toggleAllCharacters(false)">None</a> ]
-    </div>
+<!--    <div class="header-options">[ <a href="#" (click)="toggleAllCharacters(true)">All</a>-->
+<!--      | <a href="#" (click)="toggleAllCharacters(false)">None</a> ]-->
+<!--    </div>-->
 
     <!-- Show only a subset -->
     <div *ngIf="show; else elseBlock">
@@ -79,14 +79,14 @@
 
         <ul class="sb-list-group list-group">
         <li *ngFor="let character of showCharacters() | slice:0:5; let i=index" class="sb-list-item list-group-item">
-          <a href="#" (click)="toggleCharacter(character)"
-           [ngClass]="{'sb-selected-type': character.selected}">{{character.id}}</a>
+          <div href="#" (click)="toggleCharacter(character)"
+           [ngClass]="{'sb-selected-character': character.selected}">{{character.id}}</div>
         </li>
         </ul>
 
         <ul class="sb-list-group-center list-group">
         <li *ngFor="let character of showCharacters() | slice:0:5; let i=index" class="sb-list-item list-group-item">
-          <a align="center" [ngClass]="{'sb-selected-type': character.selected}">{{character.total}}</a>
+          <div align="center" [ngClass]="{'sb-selected-character': character.selected}">{{character.total}}</div>
         </li>
         </ul>
       </div> 
@@ -97,20 +97,20 @@
 
         <ul class="sb-list-group list-group">
         <li *ngFor="let character of showCharacters()" class="sb-list-item list-group-item">
-          <a href="#"  (click)="toggleCharacter(character)"
-           [ngClass]="{'sb-selected-type': character.selected}">{{character.id}}</a>
+          <div href="#"  (click)="toggleCharacter(character)"
+           [ngClass]="{'sb-selected-character': character.selected}">{{character.id}}</div>
         </li>
         </ul>
 
         <ul class="sb-list-group-center list-group">
         <li *ngFor="let character of showCharacters()" class="sb-list-item list-group-item">
-          <a align="center" [ngClass]="{'sb-selected-type': character.selected}">{{character.total}}</a>
+          <div align="center" [ngClass]="{'sb-selected-character': character.selected}">{{character.total}}</div>
         </li>
         </ul>
       </div>
     </ng-template>
     <div class="header-options"> 
-            <a href="#" (click)="show = !show">{{show ? 'Show more' : 'Show less'}}</a>
+           [ <a href="#" (click)="show = !show">{{show ? 'Show more' : 'Show less'}}</a> ]
       </div>
     
 
