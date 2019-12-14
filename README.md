@@ -11,9 +11,7 @@ sentiment between each pair of characters over the course of the story.
 
 **In the root directory:**
 
-`app.js` is the main entry point for the Node.js back-end, which serves the front-end files statically. 
-
-The code for the Angular front-end, and the bulk of the project, is in `angular-src/shakespeer/`.
+`app.js` is the main entry point for the Node.js back-end, which serves the front-end files statically. The code for the Angular front-end, and the bulk of the project, is in `angular-src/shakespeer/`.
 
 ---
 
