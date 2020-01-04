@@ -14,6 +14,7 @@ export class SidebarComponent implements OnInit {
   characterTypeList: CharacterType[] = [];
   ascOrder: boolean = false;
   show: boolean = true;
+  showSummary: boolean = false;
 
   characterAppearList: any[] = allCharacters;
   characterList: any[] = allCharacters;
